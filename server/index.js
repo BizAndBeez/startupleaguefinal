@@ -15,7 +15,12 @@ const port = 5000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://launch.startupleague.net',
+  methods: ['GET','POST','PUT','DELETE'],
+  credentials: true,
+})
+);
 app.use('/assets', express.static('assets'));
 
 // Razorpay instance
