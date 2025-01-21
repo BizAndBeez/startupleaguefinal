@@ -72,7 +72,7 @@ const BookingPage = () => {
     }
 
     try {
-      const orderDetails = await fetch('http://localhost:5000/order', {
+      const orderDetails = await fetch('https:startupleaguefinal.onrender.com/order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,14 +104,14 @@ const BookingPage = () => {
         order_id: orderDetails.order.id,
         handler: async function (response) {
           try {
-            const validateResponse = await fetch('http://localhost:5000/validate', {
+            const validateResponse = await fetch('https:startupleaguefinal.onrender.com/validate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(response),
             }).then((res) => res.json());
 
             if (validateResponse.success) {
-              const saveBookingResponse = await fetch('http://localhost:5000/save-booking', {
+              const saveBookingResponse = await fetch('https:startupleaguefinal.onrender.com/save-booking', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
