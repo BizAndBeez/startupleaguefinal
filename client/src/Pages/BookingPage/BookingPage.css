@@ -1,0 +1,372 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+.Booking-Page-Container {
+  font-family: 'Montserrat', sans-serif;
+  background-color: black;
+  /* Set body background color */
+  color: white;
+  /* Set default text color */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.booking-startup-logo {
+  width: 250px;
+  margin-left: 20px;
+  margin-top: 60px;
+}
+
+.start-text {
+  font-size: 25px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  gap: 40px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.form-container-2 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.first-input-container {
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+}
+
+.first-name,
+.second-name,
+.phone-number,
+.email {
+  height: 40px;
+  /* Set height for all input fields */
+  border: #FFFFFF 2px solid;
+  /* White border */
+  background-color: black;
+  /* Set background to black or desired color */
+  color: white;
+  /* Text color */
+  outline: none;
+  /* Remove focus outline */
+  -webkit-text-fill-color: white;
+  /* Ensure text is white in autofill */
+}
+
+/* Specific widths for each input type */
+.first-name,
+.second-name {
+  width: 250px;
+  /* Width for first and second names */
+}
+
+.phone-number,
+.email {
+  width: 550px;
+  /* Width for phone number and email */
+}
+
+.first-name-container,
+.second-name-container,
+.phone-number-container,
+.email-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Focus state */
+.first-name:focus,
+.second-name:focus,
+.phone-number:focus,
+.email:focus {
+  background-color: black;
+  /* Keep background black on focus */
+  color: white;
+  /* Keep text white */
+  border-color: #06529b;
+  /* Optional: Change border color on focus */
+}
+
+/* Ensure autofilled text remains white */
+input:-webkit-autofill {
+  background-color: black !important;
+  /* Match background to black */
+  color: white !important;
+  /* Ensure text remains white */
+  box-shadow: 0 0 0px 1000px black inset !important;
+  /* Remove yellow background for autofill */
+  -webkit-text-fill-color: white !important;
+  /* Ensure autofilled text remains white */
+}
+
+input:-webkit-autofill:focus {
+  background-color: black !important;
+  color: white !important;
+}
+
+input:active {
+  background-color: black;
+  color: white;
+}
+
+.second-input-container {
+  margin-bottom: 30px;
+}
+
+.submit-button {
+  width: 200px;
+  height: 40px;
+  /* Height for button */
+  background-color: #06529b;
+  /* Button color */
+  color: white;
+  /* Button text color */
+  border-radius: 5px;
+  /* Rounded corners */
+  border: none;
+  /* Remove default border */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  /* Smooth transition for hover effect */
+}
+
+.submit-button:hover {
+  background-color: #054a8d;
+  /* Darker shade on hover */
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-container {
+  margin-top: 30px;
+}
+
+.payment-header {
+  margin-left: 110px;
+  font-size: 25px;
+}
+
+.payment-button {
+  height: 40px;
+  width: 200px;
+  color: #fff;
+  background-color: #06529b;
+  /* Payment button color */
+  border-radius: 5px;
+  /* Rounded corners */
+  border: none;
+  /* Remove default border */
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  /* Smooth transition for hover effect */
+}
+
+.payment-button:hover {
+  background-color: #054a8d;
+  /* Darker shade on hover */
+}
+
+.payment-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Error styles */
+.error {
+  border-color: red;
+  /* Change border color to red for errors */
+}
+
+.error-message {
+  color: red;
+  /* Error message color */
+  font-size: 12px;
+  /* Font size for error messages */
+}
+
+.ticket-container {
+  text-align: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  margin: 20px auto;
+  width: 80%;
+}
+
+.ticket-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-code {
+  width: 200px;
+  height: 200px;
+  margin-bottom: 20px;
+}
+
+.venue-details {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.ticket-container {
+  color: black;
+}
+
+@media(min-width:400px) and (max-width:600px) {
+  .booking-startup-logo {
+    width: 200px;
+    margin-left: 10px;
+    margin-top: 30px;
+  }
+
+  .start-text {
+    font-size: 20px;
+  }
+
+  .form-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-left: 0;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .form-container-2 {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .first-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .first-name,
+  .second-name,
+  .phone-number,
+  .email {
+    height: 30px;
+    /* Set height for all input fields */
+    border: #FFFFFF 2px solid;
+    /* White border */
+    background-color: black;
+    /* Set background to black or desired color */
+    color: white;
+    /* Text color */
+    outline: none;
+    /* Remove focus outline */
+    -webkit-text-fill-color: white;
+    /* Ensure text is white in autofill */
+  }
+
+  .first-name,
+  .second-name {
+    width: 100%;
+    /* Width for first and second names */
+  }
+
+  .phone-number,
+  .email {
+    width: 100%;
+    /* Width for phone number and email */
+  }
+  .second-input-container {
+    margin-bottom: 0px;
+  }
+}
+@media(max-width:400px) {
+  .booking-startup-logo {
+    width: 200px;
+    margin-left: 10px;
+    margin-top: 30px;
+  }
+
+  .start-text {
+    font-size: 20px;
+  }
+
+  .form-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-left: 0;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .form-container-2 {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .first-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .first-name,
+  .second-name,
+  .phone-number,
+  .email {
+    height: 30px;
+    /* Set height for all input fields */
+    border: #FFFFFF 2px solid;
+    /* White border */
+    background-color: black;
+    /* Set background to black or desired color */
+    color: white;
+    /* Text color */
+    outline: none;
+    /* Remove focus outline */
+    -webkit-text-fill-color: white;
+    /* Ensure text is white in autofill */
+  }
+
+  .first-name,
+  .second-name {
+    width: 100%;
+    /* Width for first and second names */
+  }
+
+  .phone-number,
+  .email {
+    width: 100%;
+    /* Width for phone number and email */
+  }
+  .second-input-container {
+    margin-bottom: 0px;
+  }
+}

@@ -1,0 +1,283 @@
+#Home {
+    width: 100%;
+    height: 750px;
+    background: url('../../assets/HomeBgImg.png');
+    background-position: center;
+    background-size: cover;
+    padding-left: 80px;
+    padding-top: 40px;
+}
+
+/* .HomeContainer{
+    width: 100%;
+    height: 750px;
+    background: url('../../assets/HomeBgImg.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    padding-left: 80px;
+    padding-top: 40px;
+} */
+.startupleague_logo {
+    width: 200px;
+}
+
+.home-text-container {
+    margin-top: 60px;
+}
+
+.home-headtext-container {
+    width: 50%;
+}
+
+.home-head-text {
+    color: #F2F2F2;
+    font-size: 70px;
+}
+
+.home-para-container {
+    width: 50%;
+    margin-top: 55px;
+}
+
+.home-para-text {
+    color: #F2F2F2;
+    font-size: 38PX;
+}
+
+.buy-tickets-btn {
+    margin-top: 40px;
+    background-color: #FF5A19;
+    border: 0;
+    outline: 0;
+    padding: 15px 40px;
+    border-radius: 10px;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+@media(min-width:1150px) and (max-width:1285.99px) {
+    #Home {
+        height: 660px;
+        padding-left: 40px;
+    }
+
+    .home-headtext-container {
+        width: 70%;
+    }
+
+    .home-head-text {
+        font-size: 50px;
+    }
+
+    .home-para-container {
+        width: 60%;
+        margin-top: 30px;
+    }
+
+    .home-para-text {
+        font-size: 30PX;
+    }
+
+    .home-text-container {
+        margin-top: 110px;
+    }
+}
+
+@media(min-width:900px) and (max-width:1149.99px) {
+    #Home {
+        height: 600px;
+        padding-left: 30px;
+        background: url('../../assets/HomeBgImg.png');
+        background-position: center;
+        background-size: cover;
+    }
+
+    .home-headtext-container {
+        width: 70%;
+    }
+
+    .home-head-text {
+        font-size: 50px;
+    }
+
+    .home-para-container {
+        width: 60%;
+        margin-top: 30px;
+    }
+
+    .home-para-text {
+        font-size: 28PX;
+    }
+
+    .home-text-container {
+        margin-top: 110px;
+    }
+}
+@media(min-width:700px) and (max-width:899.99px) {
+    #Home {
+        height: 600px;
+        padding-left: 20px;
+        background: url('../../assets/HomeBgImg.png');
+        background-position: center;
+        background-size: cover;
+    }
+
+    .home-headtext-container {
+        width: 70%;
+    }
+
+    .home-head-text {
+        font-size: 40px;
+    }
+
+    .home-para-container {
+        width: 60%;
+        margin-top: 30px;
+    }
+
+    .home-para-text {
+        font-size: 21PX;
+    }
+
+    .home-text-container {
+        margin-top: 110px;
+    }
+}
+@media(min-width:500px) and (max-width:699.99px) {
+    #Home {
+        height: 550px;
+        padding-left: 20px;
+        background: url('../../assets/HomeBgImg.png');
+        background-position: center;
+        background-size: cover;
+    }
+
+    .home-headtext-container {
+        width: 90%;
+    }
+
+    .home-head-text {
+        font-size: 35px;
+    }
+
+    .home-para-container {
+        width: 80%;
+        margin-top: 30px;
+    }
+
+    .home-para-text {
+        font-size: 18PX;
+    }
+
+    .home-text-container {
+        margin-top: 90px;
+    }
+    .buy-tickets-btn {
+        margin-top: 40px;
+        padding: 15px 50px;
+    }
+}
+@media(min-width:350px) and (max-width:499.99px) {
+    #Home {
+        height: 400px;
+        padding-left: 10px;
+        /* background: url('../../assets/HomeBgImg.png');
+        background-position: center;
+        background-size: cover; */
+        background: url();
+        background-color: #141A46;
+    }
+    .startupleague_logo {
+        width: 150px;
+    }
+
+    .home-headtext-container {
+        width: 95%;
+    }
+
+    .home-head-text {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .home-para-container {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .home-para-text {
+        font-size: 15PX;
+        text-align: center;
+    }
+
+    .home-text-container {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .home-buy-tkts-container{
+      
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .buy-tickets-btn {
+        margin-top: 40px;
+      padding: 10px 30px;
+    }
+}
+@media(max-width:349.99px) {
+    #Home {
+        height: 400px;
+        padding-left: 10px;
+        /* background: url('../../assets/HomeBgImg.png');
+        background-position: center;
+        background-size: cover; */
+        background: url();
+        background-color: #141A46;
+    }
+    .startupleague_logo {
+        width: 150px;
+    }
+
+    .home-headtext-container {
+        width: 95%;
+    }
+
+    .home-head-text {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .home-para-container {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .home-para-text {
+        font-size: 15PX;
+        text-align: center;
+    }
+
+    .home-text-container {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .home-buy-tkts-container{
+      
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .buy-tickets-btn {
+        margin-top: 40px;
+      padding: 10px 30px;
+    }
+}
+

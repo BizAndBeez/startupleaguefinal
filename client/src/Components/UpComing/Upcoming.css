@@ -1,0 +1,624 @@
+#Upcoming{
+    background-color: #163147;
+    width: 100%;
+    height: auto;
+    padding: 40px 20px;
+}
+.upcoming-firstcontainer{
+    width: 100%;
+    height: 500px;
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+}
+.upcoming-firstcontainer-left{
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+.upcomingPoster{
+    width: 650px;
+    border-radius: 20px;
+}
+.upcoming-firstcontainer-right{
+    width: 50%;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.upcoming-firstconatiner-right-headtext{
+    font-size: 40px;
+    border-bottom: 2px solid white;
+    color: #FF5A19;
+}
+.upcoming-firstcontainer-right-title{
+    color: #FFFFFF;
+    font-size: 35px;
+    margin-top: 20px;
+    font-weight: normal;
+}
+.upcoming-firstconatiner-right-subhead{
+    color: #FFFFFF;
+    font-size: 18px;
+    margin-top: 20px;
+    font-weight: normal;
+}
+.upcoming-firstconatiner-right-datetext{
+    /* color: #FFFFFF; */
+    color: black;
+    font-size: 16px;
+    margin-top: 20px;
+    font-weight: normal;
+    background-color: yellow;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+.upcoming-buy-tickets-btn{
+    background-color: #FF5A19;
+    border: 0;
+    outline: 0;
+    padding: 13px 25px;
+    border-radius: 10px;
+    color: black;
+    cursor: pointer;
+    margin-top: 40px;
+    font-weight: bold;
+}
+.upcoming-secondcontainer{
+    margin-top: 50px;
+    padding: 0 40px;
+}
+.upcoming-secondcontainer-paratext{
+    color: #FFFFFF;
+    font-size: 22px;
+    line-height: 40px;
+    font-family:Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+.upcoming-thirdcontainer{
+    color: white;
+    padding: 10px 40px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.upcoming-thirdcontainer-headcontainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.upcoming-thirdcontainer-headtext{
+    font-size: 40px;
+    margin-bottom: 20px;
+    color: yellow;
+}
+.container{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: aliceblue;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    padding-bottom: 20px;
+}
+.upcoming-thirdcontainer-individualcontainer-headtext{
+    font-size: 25px;
+    margin-bottom: 10px;
+    margin-top: 30px;
+    color: black;
+}
+.upcoming-thirdcontainer-ul li{
+    font-size: 22px;
+    margin-bottom: 5px;
+    list-style: none;
+    text-align: center;
+    color: black;
+}
+
+@media(min-width:900px) and (max-width:1285.99px){
+    #Upcoming{
+        height: auto;
+        padding: 0;
+    }
+    .upcoming-firstcontainer{
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstcontainer-right{
+        width: 100%;
+        height: 480px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstcontainer-left{
+        margin-top: -70px;
+    }
+    .upcomingPoster{
+        width: 700px;
+        border-radius: 20px;
+    }
+    .upcoming-secondcontainer{
+        margin-top: 50px;
+        padding: 10px;
+        width: 100%;
+    }
+    .upcoming-thirdcontainer{
+        padding: 10px 40px;
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-thirdcontainer-headtext{
+        font-size: 30px;
+        margin-bottom: 20px;
+        color: yellow;
+    }
+    .container{
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: aliceblue;
+        margin-bottom: 10px;
+        border-radius: 20px;
+        padding-bottom: 20px;
+    }
+    .upcoming-thirdcontainer-individualcontainer-headtext{
+        font-size: 23px;
+        margin-bottom: 10px;
+        margin-top: 30px;
+        color: black;
+    }
+    .upcoming-thirdcontainer-ul li{
+        font-size: 17px;
+        margin-bottom: 5px;
+        list-style: none;
+        text-align: center;
+        color: black;
+    }
+}
+@media(min-width:600px) and (max-width:899.99px){
+    #Upcoming{
+        height: auto;
+        padding: 0;
+    }
+    .upcoming-firstcontainer{
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstcontainer-right{
+        width: 100%;
+        height: 480px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstcontainer-left{
+        margin-top: -30px;
+    }
+    .upcomingPoster{
+        width: 500px;
+        border-radius: 20px;
+    }
+    .upcoming-secondcontainer{
+        margin-top: 50px;
+        padding: 10px;
+        width: 100%;
+    }
+    .upcoming-secondcontainer-paratext{
+        font-size: 19px;
+        line-height: 32px;
+    }
+    .upcoming-firstcontainer-right-title{
+        font-size: 30px;
+        margin-top: 20px;
+        font-weight: normal;
+    }
+    .upcoming-firstconatiner-right-subhead{
+        font-size: 17px;
+        margin-top: 20px;
+        font-weight: normal;
+    }
+    .upcoming-firstconatiner-right-datetext{
+        font-size: 15px;
+        margin-top: 20px;
+        font-weight: normal;
+        padding: 10px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    .upcoming-thirdcontainer{
+        padding: 10px 40px;
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-thirdcontainer-headtext{
+        font-size: 30px;
+        margin-bottom: 20px;
+        color: yellow;
+    }
+    .container{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: aliceblue;
+        margin-bottom: 10px;
+        border-radius: 20px;
+        padding: 20px;
+    }
+    .upcoming-thirdcontainer-individualcontainer-headtext{
+        font-size: 23px;
+        margin-bottom: 10px;
+        margin-top: 30px;
+        color: black;
+    }
+    .upcoming-thirdcontainer-ul li{
+        font-size: 17px;
+        margin-bottom: 5px;
+        list-style: none;
+        text-align: center;
+        color: black;
+    }
+}
+@media(min-width:400px) and (max-width:599.99px){
+    #Upcoming{
+        height: auto;
+        padding: 0;
+    }
+    .upcoming-firstcontainer{
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstcontainer-right{
+        width: 100%;
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstconatiner-right-headtext{
+        font-size: 30px;
+        border-bottom: 2px solid white;
+        color: #FF5A19;
+    }
+    .upcoming-firstcontainer-left{
+        margin-top: -30px;
+    }
+    .upcomingPoster{
+        width: 350px;
+        border-radius: 20px;
+    }
+    .upcoming-secondcontainer{
+        margin-top: 20px;
+        padding: 10px;
+        width: 100%;
+    }
+    .upcoming-secondcontainer-paratext{
+        font-size: 17px;
+        line-height: 25px;
+    }
+    .upcoming-firstcontainer-right-title{
+        font-size: 20px;
+        margin-top: 20px;
+        font-weight: normal;
+    }
+    .upcoming-firstconatiner-right-subhead{
+        font-size: 16px;
+        margin-top: 20px;
+        font-weight: normal;
+        text-align: center;
+    }
+    .upcoming-firstconatiner-right-date-container{
+        width: 90%;
+    }
+    .upcoming-firstconatiner-right-datetext{
+        font-size: 14px;
+        margin-top: 20px;
+        font-weight: normal;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .upcoming-buy-tickets-btn{
+        padding: 13px 25px;
+        border-radius: 10px;
+        color: black;
+        cursor: pointer;
+        margin-top: 40px;
+        font-weight: bold;
+    }
+    .upcoming-thirdcontainer{
+        padding: 10px;
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-thirdcontainer-headtext{
+        font-size: 30px;
+        margin-bottom: 20px;
+        color: yellow;
+    }
+    .container{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: aliceblue;
+        margin-bottom: 10px;
+        border-radius: 20px;
+        padding: 0 5px;
+    }
+    .upcoming-thirdcontainer-individualcontainer-headtext{
+        font-size: 23px;
+        margin-bottom: 10px;
+        margin-top: 30px;
+        color: black;
+    }
+    .upcoming-thirdcontainer-ul li{
+        font-size: 17px;
+        margin-bottom: 5px;
+        list-style: none;
+        text-align: center;
+        color: black;
+    }
+}
+@media(min-width:350px) and (max-width:399.99px){
+    #Upcoming{
+        height: auto;
+        padding: 0;
+    }
+    .upcoming-firstcontainer{
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstcontainer-right{
+        width: 100%;
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstconatiner-right-headtext{
+        font-size: 25px;
+        border-bottom: 2px solid white;
+        color: #FF5A19;
+    }
+    .upcoming-firstcontainer-left{
+        margin-top: -30px;
+    }
+    .upcomingPoster{
+        width: 330px;
+        border-radius: 20px;
+    }
+    .upcoming-secondcontainer{
+        padding: 0 5px;
+    }
+    .upcoming-secondcontainer-paracontainer{
+        width: 100%;
+    }
+    .upcoming-secondcontainer-paratext{
+        font-size: 16px;
+        line-height: 23px;
+    }
+    .upcoming-firstcontainer-right-title{
+        font-size: 17px;
+        margin-top: 20px;
+        font-weight: normal;
+    }
+    .upcoming-firstconatiner-right-subhead{
+        font-size: 15px;
+        margin-top: 10px;
+        font-weight: normal;
+        text-align: center;
+    }
+    .upcoming-firstconatiner-right-date-container{
+        width: 90%;
+    }
+    .upcoming-firstconatiner-right-datetext{
+        font-size: 13px;
+        line-height: 25px;
+        margin-top: 20px;
+        font-weight: normal;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+
+    }
+    .upcoming-buy-tickets-btn{
+        padding: 13px 25px;
+        border-radius: 10px;
+        color: black;
+        cursor: pointer;
+        margin-top: 40px;
+        font-weight: bold;
+    }
+    .upcoming-thirdcontainer{
+        padding: 10px;
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-thirdcontainer-headtext{
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: yellow;
+    }
+    .container{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: aliceblue;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        padding: 0 5px;
+    }
+    .upcoming-thirdcontainer-individualcontainer-headtext{
+        font-size: 20px;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        color: black;
+    }
+    .upcoming-thirdcontainer-ul li{
+        font-size: 15px;
+        margin-bottom: 5px;
+        list-style: none;
+        text-align: center;
+        color: black;
+    }
+}
+@media(max-width:349.99px){
+    #Upcoming{
+        height: auto;
+        padding: 0;
+    }
+    .upcoming-firstcontainer{
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstcontainer-right{
+        width: 100%;
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-firstconatiner-right-headtext{
+        font-size: 25px;
+        border-bottom: 2px solid white;
+        color: #FF5A19;
+    }
+    .upcoming-firstcontainer-left{
+        margin-top: -30px;
+    }
+    .upcomingPoster{
+        width: 250px;
+        border-radius: 20px;
+    }
+    .upcoming-secondcontainer{
+        padding: 0 5px;
+    }
+    .upcoming-secondcontainer-paracontainer{
+        width: 100%;
+    }
+    .upcoming-secondcontainer-paratext{
+        font-size: 16px;
+        line-height: 23px;
+    }
+    .upcoming-firstcontainer-right-title{
+        font-size: 17px;
+        margin-top: 20px;
+        font-weight: normal;
+    }
+    .upcoming-firstconatiner-right-subhead{
+        font-size: 15px;
+        margin-top: 10px;
+        font-weight: normal;
+        text-align: center;
+    }
+    .upcoming-firstconatiner-right-date-container{
+        width: 90%;
+    }
+    .upcoming-firstconatiner-right-datetext{
+        font-size: 13px;
+        line-height: 25px;
+        margin-top: 20px;
+        font-weight: normal;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+
+    }
+    .upcoming-buy-tickets-btn{
+        padding: 13px 25px;
+        border-radius: 10px;
+        color: black;
+        cursor: pointer;
+        margin-top: 40px;
+        font-weight: bold;
+    }
+    .upcoming-thirdcontainer{
+        padding: 10px;
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .upcoming-thirdcontainer-headtext{
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: yellow;
+    }
+    .container{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: aliceblue;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        padding: 0 5px;
+    }
+    .upcoming-thirdcontainer-individualcontainer-headtext{
+        font-size: 20px;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        color: black;
+    }
+    .upcoming-thirdcontainer-ul li{
+        font-size: 15px;
+        margin-bottom: 5px;
+        list-style: none;
+        text-align: center;
+        color: black;
+    }
+}

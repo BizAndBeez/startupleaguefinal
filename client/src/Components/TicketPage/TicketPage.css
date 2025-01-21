@@ -1,0 +1,145 @@
+.ticket-container {
+    max-width: 600px;
+    min-height: 100%; /* Ensure it grows with content */
+  overflow: visible;
+    margin: 50px auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ticket-img-container{
+    width: 90%;
+    margin-top: 30px;
+  }
+
+  .ticket-img{
+    width: 100%;
+    border-radius: 15px;
+  }
+  .ticket-details-container{
+    margin-top: 20px;
+  }
+  .venue-details-container{
+    margin-top: 20px;
+  }
+  .order-summary-container{
+    margin-top: 20px;
+  }
+  .ticket-container h2 {
+    color: #333333;
+    font-size: 22px;
+    /* margin-bottom: 10px; */
+  }
+  
+  .ticket-container p {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #555555;
+  }
+  
+  .ticket-container p strong {
+    color: #333333;
+  }
+  
+  .ticket-container .qr-code {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .ticket-container .qr-code canvas {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .ticket-container {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  .qr-code-container{
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-code-img{
+    width: 150px;
+  }
+  .download-btn{
+    outline: 0;
+    border: 0;
+    background-color: brown;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media(max-width:450px){
+    .ticket-container {
+      max-width: 100%;
+      margin: 20px 30px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+    }
+    .startup-headtext{
+      font-size: 20px;
+    }
+    .ticket-img-container{
+      width: 100%;
+      margin-top: 30px;
+    }
+    .ticket-container h2 {
+      color: #333333;
+      font-size: 18px;
+      /* margin-bottom: 10px; */
+    }
+    .ticket-container p {
+      margin: 10px 0;
+      font-size: 12px;
+      color: #555555;
+    }
+    .ticket-details-container{
+      margin-top: 10px;
+    }
+    .venue-details-container{
+      margin-top: 10px;
+    }
+    .order-summary-container{
+      margin-top: 10px;
+    }
+    .qr-code-container{
+      margin-top: 0;
+    }
+    .qr-code-img{
+      width: 100px;
+    }
+    .download-btn{
+      outline: 0;
+      border: 0;
+      background-color: brown;
+      padding: 10px;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  }
+  

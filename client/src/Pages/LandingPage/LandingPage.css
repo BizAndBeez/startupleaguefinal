@@ -1,0 +1,549 @@
+#LandingPage{
+    padding: 20px 100px;
+    background-color: #000000;
+    height: auto;
+}
+.logo{
+    width: 250px;
+}
+.landingpage-home-container{
+    padding-top: 40px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.landingpage-headtext{
+    color: #FF5A19;
+    font-size: 40px;
+    text-align: center;
+}
+.landingpage-home-datelocation-text-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+}
+.landingpage-home-datelocation-text{
+    color: #FFFFFF;
+    margin-top: 18px;
+    font-weight: normal;
+}
+.landingpage-home-subtext-container{
+    width: 38%;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    
+}
+.landingpage-home-subtext{
+    text-align: center;
+}
+.landingpage-home-btn{
+    margin-top: 20px;
+    outline: none;
+    border: none;
+    background-color: #FF5A19;
+    width: 150px;
+    height: 50px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.landingpageimg-container{
+    width: 100%;
+    margin-top: 50px;
+}
+.landingpageimg{
+    width: 100%;
+    border-radius: 50px;
+}
+.event-details-container{
+    margin-top: 40px;
+}
+.event-details-headtext{
+    color: #FF5A19;
+    font-size: 30px;
+}
+.event-details-list-container{
+    padding-left: 20px;
+    padding-top: 20px;
+}
+.event-details-list-container li{
+    color: #FFFFFF;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+.about-event-container{
+    margin-top: 30px;
+}
+.about-event-headtext{
+    color: #FF5A19;
+    font-size: 30px;   
+}
+.about-event-paratext{
+    color: #FFFFFF;
+    font-size: 20px;
+    margin-top: 15px;
+    line-height: 25px;
+}
+.event-highlights-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+.event-highlights-headtext{
+    color: #FF5A19;
+    font-size: 30px; 
+}
+.container-of-individuals{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.individual-event-highlights-container{
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    gap: 10px;
+}
+.individual-event-highlights-headtext{
+    font-size: 20px;
+}
+.individual-event-highlights-container ul li{
+    list-style: none;
+    text-align: center;
+    font-size: 18px;
+}
+.make-yourmark-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+}
+.make-yourmark-headtext{
+    color: #FF5A19;
+    font-size: 30px; 
+    margin-top: 20px; 
+    margin-bottom: 15px; 
+}
+.make-yourmark-paratext{
+    color: #FFFFFF;
+    font-size: 20px;
+}
+.ticketpicker-container{
+    margin-top: 40px;
+    color: white;
+}
+.tickets-headtext-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    color: white;
+}
+.tickets-headtext, .quantity-headtext{
+    font-size: 20px;
+}
+.conatiner-of-ticketpicker{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 20px;
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+}
+.individual-ticketpicker-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-top: 20px;
+    border-bottom: 1px solid grey;
+}
+.ticketpicker-pricecontainer{
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.ticket-type-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    width: 50%;
+    border-right: 1px solid grey;
+    margin-bottom: 20px;
+}
+.ticket-type-text{
+    font-size: 18px;
+}
+.ticket-category-text{
+    font-size: 17px;
+}
+.more-info-text{
+    font-size: 16px;
+    cursor: pointer;
+    border-bottom: 2px solid rgb(221, 113, 113);
+}
+.checkout-container{
+    display: flex;
+    flex-direction: column;
+}
+.total-amount{
+    color: white;
+}
+.decrement-btn, .increment-btn{
+    border: 0;
+    outline: 0;
+    padding: 5px;
+    background-color: #FF5A19;
+    margin: 5px;
+    color: white;
+    cursor: pointer;
+    border-radius: 2px;
+    font-size: 18px;
+}
+.price-btn{
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+.rate-btn{
+    font-size: 16px;
+}
+.increment-decrement-container{
+    margin-left: 10px;
+}
+.checkout-btn{
+    margin-top: 20px;
+    outline: 0;
+    border: 0;
+    padding: 10px;
+    background-color: #FF5A19;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+}
+.total-amount{
+    margin-top: 10px;
+    font-size: 20px;
+}
+.proceed-btn{
+    margin-top: 10px;
+    outline: 0;
+    border: 0;
+    padding: 10px 40px;
+    font-size: 15px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.checkout-amount-container{
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+.proceed-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 706px ) and (max-width: 850px){
+    #LandingPage{
+        padding: 20px 40px;
+    }
+    .landingpage-home-subtext-container{
+        margin-top: 30px;
+        font-size: 15px;
+        width: 90%;
+    }
+    .landingpage-home-datelocation-text-container{
+        text-align: center;
+    }
+    .landingpage-home-datelocation-text{
+        width: 100%;
+        text-align: center;
+        
+    }
+}
+
+@media (min-width: 556px ) and (max-width: 706px){
+    #LandingPage{
+        padding: 10px 20px;
+    }
+    .landingpage-home-subtext-container{
+        margin-top: 30px;
+        font-size: 15px;
+        width: 90%;
+    }
+    .landingpage-home-datelocation-text-container{
+        text-align: center;
+        width: 100%;
+    }
+    .landingpage-home-datelocation-text{
+        width: 100%;
+        text-align: center;
+        
+    }
+}
+
+
+@media (min-width: 350px ) and (max-width: 560px){
+    .individual-ticketpicker-container{
+        display: flex;
+        flex-direction: column;
+    }
+    #LandingPage{
+        padding: 10px;
+    }
+    .logo{
+        width: 150px;
+        margin-top: 20px;
+    }
+    .landingpage-headtext{
+        color: #FF5A19;
+        font-size: 20px;
+        text-align: center;
+    }
+    .landingpage-home-subtext-container{
+        margin-top: 10px;
+        font-size: 15px;
+        width: 100%;
+    }
+    .landingpage-home-datelocation-text-container{
+        text-align: center;
+        width: 100%;
+    }
+    .landingpage-home-datelocation-text{
+        width: 100%;
+        text-align: center;
+        font-size: 17px;  
+    }
+    .landingpage-home-subtext-container{
+        width: 90%;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;  
+    }
+    .landingpage-home-subtext{
+        text-align: center;
+        font-size: 15px;
+        line-height: 20px;
+    }
+    .landingpageimg-container{
+        width: 100%;
+        margin-top: 40px;
+    }
+    .landingpageimg{
+        width: 100%;
+        border-radius: 10px;
+    }
+    .event-details-headtext{
+        color: #FF5A19;
+        font-size: 20px;
+    }
+    .ticket-type-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        width: 100%;
+        border-right: none;
+        padding: 10px;
+       
+        margin-bottom: 10px;
+    }
+    .increment-decrement-container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .ticketpicker-pricecontainer{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 60px;
+        
+    }
+    .decrement-btn, .increment-btn{
+        border: 0;
+        outline: 0;
+        padding: 5px;
+        background-color: #FF5A19;
+        margin: 5px;
+        color: white;
+        cursor: pointer;
+        border-radius: 2px;
+        font-size: 17px;
+    }
+    .price-btn{
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+    .rate-btn{
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    .checkout-amount-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .conatiner-of-ticketpicker{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 5px;
+        border-top: 1px solid grey;
+        border-bottom: 1px solid grey;
+    }
+    .individual-ticketpicker-container{
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        margin-top: 5px;
+        border-bottom: 1px solid grey;
+    }
+    .proceed-container{
+        margin-top: 20px;
+    }
+}
+@media(max-width: 349px){
+    .individual-ticketpicker-container{
+        display: flex;
+        flex-direction: column;
+    }
+    #LandingPage{
+        padding: 10px;
+    }
+    .logo{
+        width: 150px;
+        margin-top: 20px;
+    }
+    .landingpage-headtext{
+        color: #FF5A19;
+        font-size: 20px;
+        text-align: center;
+    }
+    .landingpage-home-subtext-container{
+        margin-top: 10px;
+        font-size: 15px;
+        width: 100%;
+    }
+    .landingpage-home-datelocation-text-container{
+        text-align: center;
+        width: 100%;
+    }
+    .landingpage-home-datelocation-text{
+        width: 100%;
+        text-align: center;
+        font-size: 17px;  
+    }
+    .landingpage-home-subtext-container{
+        width: 90%;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;  
+    }
+    .landingpage-home-subtext{
+        text-align: center;
+        font-size: 15px;
+        line-height: 20px;
+    }
+    .landingpageimg-container{
+        width: 100%;
+        margin-top: 40px;
+    }
+    .landingpageimg{
+        width: 100%;
+        border-radius: 10px;
+    }
+    .event-details-headtext{
+        color: #FF5A19;
+        font-size: 20px;
+    }
+    .ticket-type-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        width: 100%;
+        border-right: none;
+        padding: 10px;
+       
+        margin-bottom: 10px;
+    }
+    .increment-decrement-container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .ticketpicker-pricecontainer{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 60px;
+        
+    }
+    .decrement-btn, .increment-btn{
+        border: 0;
+        outline: 0;
+        padding: 5px;
+        background-color: #FF5A19;
+        margin: 5px;
+        color: white;
+        cursor: pointer;
+        border-radius: 2px;
+        font-size: 17px;
+    }
+    .price-btn{
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+    .rate-btn{
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    .checkout-amount-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .conatiner-of-ticketpicker{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 5px;
+        border-top: 1px solid grey;
+        border-bottom: 1px solid grey;
+    }
+    .individual-ticketpicker-container{
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        margin-top: 5px;
+        border-bottom: 1px solid grey;
+    }
+}

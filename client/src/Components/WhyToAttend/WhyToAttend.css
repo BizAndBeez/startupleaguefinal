@@ -1,0 +1,216 @@
+.whytoattend-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 500px;
+    padding-top: 40px;
+}
+
+.whyto-container-individual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.whytoattend-individual-container {
+    width: 400px;
+    height: 170px;
+    border-radius: 15px;
+    background-color: rgb(224, 232, 232);
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 10px;
+}
+
+.whytoattend-headtext {
+    font-size: 30px
+}
+
+.whytoattend-individual-container-headtext {
+    font-size: 20px;
+}
+
+.whytoattend-individual-container-paratext {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.whytoattend-endpara-container {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background-color: rgb(10, 18, 26);
+    border-radius: 2px;
+    font-weight: 300;
+    padding: 20px;
+    border-top-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    gap: 10px;
+}
+
+.whytoattend-endpara1 {
+    font-size: 18px;
+}
+
+.whytoattend-endpara2 {
+    font-size: 17px;
+    color: yellow;
+}
+
+@media(min-width:850px) and (max-width:1285.99px) {
+    .whytoattend-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        padding: 40px 0px;
+    }
+
+    .whyto-container-individual {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        place-items: center;
+    }
+    .whytoattend-individual-container:nth-child(3){
+        transform: translate(200px, -50px);
+    }
+    .whytoattend-endpara-container {
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        margin-top: 0;
+        gap: 10px;
+        width: 90%;
+    }
+    .whytoattend-endpara1 {
+        font-size: 17px;
+        text-align: center;
+    }
+    
+    .whytoattend-endpara2 {
+        font-size: 16px;
+        text-align: center;
+    }
+}
+@media(min-width:500px) and (max-width:849.99px) {
+    .whytoattend-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        padding: 40px 0px;
+    }
+
+    .whyto-container-individual {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    .whytoattend-individual-container {
+        width: 90%;
+        height: 170px;
+        margin-top: 20px;
+        padding: 20px 10px;
+    }
+    .whytoattend-endpara-container {
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        margin-top: 20px;
+        gap: 10px;
+        width: 90%;
+    }
+    .whytoattend-endpara1 {
+        font-size: 17px;
+        text-align: center;
+    }
+    
+    .whytoattend-endpara2 {
+        font-size: 16px;
+        text-align: center;
+    }
+}
+@media(min-width:350px) and (max-width:499.99px) {
+    .whytoattend-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        padding: 40px 0px;
+    }
+
+    .whyto-container-individual {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    .whytoattend-individual-container {
+        width: 90%;
+        height: 170px;
+        margin-top: 20px;
+        padding: 20px 10px;
+    }
+    .whytoattend-endpara-container {
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        margin-top: 20px;
+        gap: 10px;
+        width: 90%;
+    }
+    .whytoattend-endpara1 {
+        font-size: 15px;
+        text-align: center;
+    }
+    
+    .whytoattend-endpara2 {
+        font-size: 14px;
+        text-align: center;
+        color: yellow;
+    }
+    .whytoattend-headtext {
+        font-size: 22px
+    }
+}
+@media(max-width:349.99px) {
+    .whytoattend-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        padding: 40px 0px;
+    }
+
+    .whyto-container-individual {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    .whytoattend-individual-container {
+        width: 90%;
+        height: 170px;
+        margin-top: 20px;
+        padding: 20px 10px;
+    }
+    .whytoattend-endpara-container {
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        margin-top: 20px;
+        gap: 10px;
+        width: 90%;
+    }
+    .whytoattend-endpara1 {
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    .whytoattend-endpara2 {
+        font-size: 13px;
+        text-align: center;
+    }
+    .whytoattend-headtext {
+        font-size: 22px
+    }
+}
