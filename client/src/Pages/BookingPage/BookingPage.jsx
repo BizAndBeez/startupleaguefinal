@@ -103,7 +103,6 @@ const BookingPage = () => {
         image: startupleague_logo,
         order_id: orderDetails.order.id,
         handler: async function (response) {
-          // Handle payment success
           try {
             const validateResponse = await fetch('http://localhost:5000/validate', {
               method: 'POST',
@@ -122,9 +121,19 @@ const BookingPage = () => {
                   paymentId: response.razorpay_payment_id,
                   orderId: response.razorpay_order_id,
                 }),
-              }).then((res) => res.json());
+              });
 
-              if (saveBookingResponse.success) {
+              // Fetch custom header
+              const fingerprintId = saveBookingResponse.headers.get('x-rtb-fingerprint-id');
+              if (fingerprintId) {
+                console.log('Fingerprint ID:', fingerprintId);
+              } else {
+                console.log('Fingerprint ID header not found.');
+              }
+
+              const saveBookingData = await saveBookingResponse.json();
+
+              if (saveBookingData.success) {
                 alert('Payment Successful! Booking data saved.');
                 setTicketDetails({
                   ...formData,
@@ -148,13 +157,12 @@ const BookingPage = () => {
         prefill: {
           name: `${formData.firstName} ${formData.secondName}`,
           email: formData.email,
-          contact: formData.phoneNumber, // Ensure the correct phone number is passed
+          contact: formData.phoneNumber,
         },
         theme: {
           color: '#3399cc',
         },
       };
-
 
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
@@ -163,7 +171,6 @@ const BookingPage = () => {
       alert('Unable to create Razorpay order. Please try again.');
     }
   };
-
 
   return (
     <section className='Booking-Page-Container'>

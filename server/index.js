@@ -16,17 +16,19 @@ const port = 5000;
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "https://launch.startupleague.net",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-    exposedHeaders: ["x-rtb-fingerprint-id"], // Allow access to custom headers
+    origin: "https://launch.startupleague.net", // Allowed origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    credentials: true, // Allow credentials (cookies, etc.)
+    exposedHeaders: ["x-rtb-fingerprint-id"], // Expose custom headers
   })
 );
-app.use("/assets", express.static("assets"));
 
-// Add middleware to expose headers explicitly
+// Add middleware to explicitly expose the headers
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Expose-Headers", "x-rtb-fingerprint-id");
+  res.setHeader("Access-Control-Allow-Origin", "https://launch.startupleague.net");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.setHeader("Access-Control-Expose-Headers", "x-rtb-fingerprint-id"); // Expose the custom header
   next();
 });
 
