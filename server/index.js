@@ -8,20 +8,27 @@ const mongoose = require("mongoose");
 const QRCode = require("qrcode");
 const nodemailer = require("nodemailer");
 const path = require("path");
-// import ticketImg from './assets/TicketImg.jpg'
 
 const app = express();
 const port = 5000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors({
-  origin: 'https://launch.startupleague.net',
-  methods: ['GET','POST','PUT','DELETE'],
-  credentials: true,
-})
+app.use(
+  cors({
+    origin: "https://launch.startupleague.net",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    exposedHeaders: ["x-rtb-fingerprint-id"], // Allow access to custom headers
+  })
 );
-app.use('/assets', express.static('assets'));
+app.use("/assets", express.static("assets"));
+
+// Add middleware to expose headers explicitly
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Expose-Headers", "x-rtb-fingerprint-id");
+  next();
+});
 
 // Razorpay instance
 const razorpay = new Razorpay({
@@ -174,8 +181,6 @@ app.post("/save-booking", async (req, res) => {
     });
     const qrCode = await QRCode.toDataURL(qrData);
 
-    const qrCodeBuffer = Buffer.from(qrCode.split(",")[1], "base64") 
-
     // Save booking data
     const newBooking = new Booking({
       firstName,
@@ -199,8 +204,8 @@ app.post("/save-booking", async (req, res) => {
         tickets,
         venueDetails,
       },
-      "cid:qrCodeImage" 
-      );
+      "cid:qrCodeImage"
+    );
 
     // Send email
     const transporter = nodemailer.createTransport({
@@ -222,11 +227,11 @@ app.post("/save-booking", async (req, res) => {
           path: path.join(__dirname, "./assets/TicketImg.jpg"),
           cid: "ticketImage",
         },
-        // {
-        //   filename: "QrCode.png",
-        //   content: qrCodeBuffer,
-        //   cid: "qrCode"
-        // },
+        {
+          filename: "QrCode.png",
+          content: Buffer.from(qrCode.split(",")[1], "base64"),
+          cid: "qrCodeImage",
+        },
       ],
     };
 
@@ -237,7 +242,6 @@ app.post("/save-booking", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to save booking data or send email." });
   }
 });
-
 
 // Start the server
 app.listen(port, () => {
