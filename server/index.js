@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Define allowed origins
-const allowedOrigins = ['http://localhost:5173', 'https://launch.startupleague.net'];
+const allowedOrigins = ['http://localhost:5173', 'https://launch.startupleague.net' , 'https://startupleaguefinal-front.onrender.com'];
 
 // CORS configuration
 app.use(cors({
