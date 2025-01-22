@@ -186,7 +186,7 @@ app.post("/webhook", express.json(), async (req, res) => {
   try {
     const webhookBody = JSON.stringify(req.body);
     const razorpaySignature = req.headers["x-razorpay-signature"];
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    const webhookSecret = "indian@2025";
 
     const generated_signature = crypto
       .createHmac("sha256", webhookSecret)
