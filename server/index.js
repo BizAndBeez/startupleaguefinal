@@ -41,9 +41,7 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-  res.setHeader("Access-Control-Allow-Origin", "https://launch.startupleague.net");
 
-  
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
@@ -96,12 +94,9 @@ app.get("/", (req, res) => {
 // Create Razorpay order
 app.post("/order", async (req, res) => {
   try {
-    console.log("Received order request:", req.body);  // Debug log
-    
     const { amount, currency, receipt } = req.body;
 
     if (!amount || !currency || !receipt) {
-      console.log("Missing required fields");  // Debug log
       return res.status(400).json({ 
         success: false,
         error: "Missing required fields",
@@ -115,14 +110,9 @@ app.post("/order", async (req, res) => {
       receipt,
     };
 
-    console.log("Creating order with options:", options);  // Debug log
-
     const order = await razorpay.orders.create(options);
-    console.log("Order created:", order);  // Debug log
-    
     res.json({ success: true, order });
   } catch (error) {
-    console.error("Order creation error:", error);
     res.status(500).json({ 
       success: false,
       error: "Failed to create Razorpay order",
@@ -134,12 +124,9 @@ app.post("/order", async (req, res) => {
 // Validate payment
 app.post("/validate", async (req, res) => {
   try {
-    console.log("Received validation request:", req.body);  // Debug log
-    
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-      console.log("Missing validation fields");  // Debug log
       return res.status(400).json({ 
         success: false, 
         message: "Missing payment validation fields" 
@@ -151,9 +138,6 @@ app.post("/validate", async (req, res) => {
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
 
-    console.log("Generated signature:", generated_signature);  // Debug log
-    console.log("Received signature:", razorpay_signature);   // Debug log
-
     if (generated_signature === razorpay_signature) {
       res.status(200).json({ success: true });
     } else {
@@ -163,7 +147,6 @@ app.post("/validate", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Validation error:", error);
     res.status(500).json({ 
       success: false, 
       message: "Error validating payment",
@@ -175,19 +158,15 @@ app.post("/validate", async (req, res) => {
 // Save booking data
 app.post("/save-booking", async (req, res) => {
   try {
-    console.log("Received booking request:", req.body);  // Debug log
-    
     const { firstName, secondName, phoneNumber, email, paymentId, orderId } = req.body;
 
     if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
-      console.log("Missing booking fields");  // Debug log
       return res.status(400).json({ 
         success: false, 
         message: "Missing required booking fields" 
       });
     }
 
-    // Generate QR code
     const qrCode = await QRCode.toDataURL(
       JSON.stringify({
         firstName,
@@ -200,7 +179,6 @@ app.post("/save-booking", async (req, res) => {
       })
     );
 
-    // Create and save booking
     const booking = new Booking({
       firstName,
       secondName,
@@ -212,32 +190,23 @@ app.post("/save-booking", async (req, res) => {
     });
 
     await booking.save();
-    console.log("Booking saved:", booking);  // Debug log
 
-    // Send confirmation email
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
-      try {
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: email,
-          subject: 'Booking Confirmation',
-          html: `
-            <h1>Booking Confirmation</h1>
-            <p>Dear ${firstName} ${secondName},</p>
-            <p>Your booking has been confirmed.</p>
-            <p>Booking Details:</p>
-            <ul>
-              <li>Order ID: ${orderId}</li>
-              <li>Payment ID: ${paymentId}</li>
-            </ul>
-            <img src="${qrCode}" alt="QR Code"/>
-          `
-        });
-        console.log("Confirmation email sent");  // Debug log
-      } catch (emailError) {
-        console.error("Error sending confirmation email:", emailError);
-      }
-    }
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Booking Confirmation',
+      html: `
+        <h1>Booking Confirmation</h1>
+        <p>Dear ${firstName} ${secondName},</p>
+        <p>Your booking has been confirmed.</p>
+        <p>Booking Details:</p>
+        <ul>
+          <li>Order ID: ${orderId}</li>
+          <li>Payment ID: ${paymentId}</li>
+        </ul>
+        <img src="${qrCode}" alt="QR Code"/>
+      `
+    });
 
     res.status(201).json({ 
       success: true, 
@@ -247,7 +216,6 @@ app.post("/save-booking", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error saving booking:", error);
     res.status(500).json({ 
       success: false, 
       message: "Error saving booking",
@@ -256,14 +224,43 @@ app.post("/save-booking", async (req, res) => {
   }
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    success: false, 
-    message: "Internal server error",
-    details: err.message 
-  });
+// Webhook route
+app.post("/webhook", (req, res) => {
+  try {
+    const webhookBody = JSON.stringify(req.body);
+    const razorpaySignature = req.headers["x-razorpay-signature"];
+
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    const generated_signature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(webhookBody)
+      .digest("hex");
+
+    if (generated_signature !== razorpaySignature) {
+      return res.status(400).json({ success: false, message: "Invalid signature" });
+    }
+
+    const event = req.body.event;
+
+    switch (event) {
+      case "payment.captured":
+        console.log("Payment Captured:", req.body.payload.payment.entity);
+        break;
+      case "payment.failed":
+        console.log("Payment Failed:", req.body.payload.payment.entity);
+        break;
+      default:
+        console.log("Unhandled event:", event);
+    }
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: "Webhook processing failed", 
+      details: error.message 
+    });
+  }
 });
 
 // Start server
@@ -273,9 +270,7 @@ app.listen(port, () => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('Received SIGTERM. Performing graceful shutdown...');
   mongoose.connection.close(() => {
-    console.log('MongoDB connection closed.');
     process.exit(0);
   });
 });
