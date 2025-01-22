@@ -1,13 +1,35 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation to access navigation state
+import { useLocation } from 'react-router-dom';
 import QRCode from "react-qr-code";
 import startupleague_logo from '../../assets/startupleague_logo.png';
 import './BookingPage.css';
 import TicketPage from '../../Components/TicketPage/TicketPage';
 
+const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers
+        },
+        credentials: 'include',
+        mode: 'cors',
+      });
+
+      if (response.ok) return response.json();
+      throw new Error(`HTTP error! status: ${response.status}`);
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+};
+
 const BookingPage = () => {
-  const location = useLocation(); // Access data sent from LandingPage
-  const { tickets = [], totalAmount = 0 } = location.state || {}; // Destructure tickets and totalAmount
+  const location = useLocation(); 
+  const { tickets = [], totalAmount = 0 } = location.state || {};
 
   const [isOpen, setIsOpen] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
@@ -70,71 +92,66 @@ const BookingPage = () => {
       alert('Razorpay SDK failed to load. Are you online?');
       return;
     }
-
+  
     try {
-      const orderDetails = await fetch('https:startupleaguefinal.onrender.com/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: totalAmount, // Convert to paise (1 INR = 100 paise)
-          currency: 'INR',
-          receipt: `receipt_${Date.now()}`,
-        }),
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to create order: ${response.statusText}`);
+      const orderDetails = await fetchWithRetry(
+        "https://startupleaguefinal.onrender.com/order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: totalAmount,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+            capture: 1
+          }),
         }
-        return response.json();
-      });
-
+      );
+  
       if (!orderDetails || !orderDetails.order) {
-        alert('Failed to create Razorpay order.');
+        alert("Failed to create Razorpay order.");
         return;
       }
-
+  
       const options = {
-        key: import.meta.env.VITE_APP_RAZORPAY_KEY_ID, // Razorpay Key ID
+        key: import.meta.env.VITE_APP_RAZORPAY_KEY_ID,
         amount: orderDetails.order.amount,
         currency: orderDetails.order.currency,
-        name: 'Startup League',
-        description: 'Event Booking Payment',
+        name: "Startup League",
+        description: "Event Booking Payment",
         image: startupleague_logo,
         order_id: orderDetails.order.id,
-        handler: async function (response) {
+        handler: async (response) => {
           try {
-            const validateResponse = await fetch('https:startupleaguefinal.onrender.com/validate', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(response),
-            }).then((res) => res.json());
-
-            if (validateResponse.success) {
-              const saveBookingResponse = await fetch('https:startupleaguefinal.onrender.com/save-booking', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  ...formData,
-                  tickets,
-                  totalAmount,
-                  paymentId: response.razorpay_payment_id,
-                  orderId: response.razorpay_order_id,
-                }),
-              });
-
-              // Fetch custom header
-              const fingerprintId = saveBookingResponse.headers.get('x-rtb-fingerprint-id');
-              if (fingerprintId) {
-                console.log('Fingerprint ID:', fingerprintId);
-              } else {
-                console.log('Fingerprint ID header not found.');
+            const validateResponse = await fetchWithRetry(
+              "https://startupleaguefinal.onrender.com/validate",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(response),
               }
-
-              const saveBookingData = await saveBookingResponse.json();
-
-              if (saveBookingData.success) {
-                alert('Payment Successful! Booking data saved.');
+            );
+  
+            if (validateResponse.success) {
+              const saveBookingResponse = await fetchWithRetry(
+                "https://startupleaguefinal.onrender.com/save-booking",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    ...formData,
+                    tickets,
+                    totalAmount,
+                    paymentId: response.razorpay_payment_id,
+                    orderId: response.razorpay_order_id,
+                  }),
+                }
+              );
+  
+              if (saveBookingResponse.success) {
+                alert("Payment Successful! Booking data saved.");
                 setTicketDetails({
                   ...formData,
                   tickets,
@@ -144,14 +161,14 @@ const BookingPage = () => {
                 });
                 setShowTicket(true);
               } else {
-                alert('Payment Successful, but failed to save booking data.');
+                alert("Payment Successful, but failed to save booking data.");
               }
             } else {
-              alert('Payment Validation Failed!');
+              alert("Payment Validation Failed!");
             }
           } catch (error) {
-            console.error('Error handling payment success:', error);
-            alert('An error occurred during payment processing.');
+            console.error("Error handling payment success:", error);
+            alert("An error occurred during payment processing.");
           }
         },
         prefill: {
@@ -160,18 +177,18 @@ const BookingPage = () => {
           contact: formData.phoneNumber,
         },
         theme: {
-          color: '#3399cc',
+          color: "#3399cc",
         },
       };
-
+  
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
     } catch (error) {
-      console.error('Error initializing Razorpay:', error);
-      alert('Unable to create Razorpay order. Please try again.');
+      console.error("Error initializing Razorpay:", error);
+      alert("Unable to create Razorpay order. Please try again.");
     }
   };
-
+  
   return (
     <section className='Booking-Page-Container'>
       <img src={startupleague_logo} className='booking-startup-logo' alt='Startup League Logo' />
