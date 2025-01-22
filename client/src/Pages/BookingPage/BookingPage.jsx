@@ -116,7 +116,7 @@ const BookingPage = () => {
       }
   
       const options = {
-        key: rzp_live_DH76TKR3SzhdeS,
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderDetails.order.amount,
         currency: orderDetails.order.currency,
         name: "Startup League",
