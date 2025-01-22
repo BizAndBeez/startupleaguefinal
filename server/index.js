@@ -124,6 +124,7 @@ app.post("/order", async (req, res) => {
 // Validate payment
 app.post("/validate", async (req, res) => {
   try {
+    console.log(req.body);
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
