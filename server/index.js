@@ -16,37 +16,27 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Define allowed origins
-const allowedOrigins = ['http://localhost:5173', 'https://launch.startupleague.net' , 'https://startupleaguefinal-front.onrender.com'];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://launch.startupleague.net",
+  "https://startupleaguefinal-front.onrender.com",
+];
 
 // CORS configuration
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
-}));
-
-// Additional headers middleware
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  })
+);
 
 // Razorpay instance
 const razorpay = new Razorpay({
@@ -71,8 +61,8 @@ const bookingSchema = new mongoose.Schema({
   email: { type: String, required: true },
   paymentId: { type: String, required: true },
   orderId: { type: String, required: true },
+  status: { type: String, default: "pending" },
   createdAt: { type: Date, default: Date.now },
-  status: { type: String, default: 'pending' }
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
@@ -82,8 +72,8 @@ const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
+    pass: process.env.EMAIL_PASSWORD,
+  },
 });
 
 // Routes
@@ -97,10 +87,9 @@ app.post("/order", async (req, res) => {
     const { amount, currency, receipt } = req.body;
 
     if (!amount || !currency || !receipt) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
         error: "Missing required fields",
-        details: "amount, currency, and receipt are required" 
       });
     }
 
@@ -113,25 +102,18 @@ app.post("/order", async (req, res) => {
     const order = await razorpay.orders.create(options);
     res.json({ success: true, order });
   } catch (error) {
-    res.status(500).json({ 
-      success: false,
-      error: "Failed to create Razorpay order",
-      details: error.message 
-    });
+    console.error("Error creating order:", error.message);
+    res.status(500).json({ success: false, error: "Failed to create Razorpay order" });
   }
 });
 
 // Validate payment
 app.post("/validate", async (req, res) => {
   try {
-    console.log(req.body);
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Missing payment validation fields" 
-      });
+      return res.status(400).json({ success: false, message: "Missing payment validation fields" });
     }
 
     const generated_signature = crypto
@@ -142,17 +124,11 @@ app.post("/validate", async (req, res) => {
     if (generated_signature === razorpay_signature) {
       res.status(200).json({ success: true });
     } else {
-      res.status(400).json({ 
-        success: false, 
-        message: "Invalid payment signature" 
-      });
+      res.status(400).json({ success: false, message: "Invalid payment signature" });
     }
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Error validating payment",
-      details: error.message 
-    });
+    console.error("Error validating payment:", error.message);
+    res.status(500).json({ success: false, message: "Payment validation failed" });
   }
 });
 
@@ -162,22 +138,11 @@ app.post("/save-booking", async (req, res) => {
     const { firstName, secondName, phoneNumber, email, paymentId, orderId } = req.body;
 
     if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Missing required booking fields" 
-      });
+      return res.status(400).json({ success: false, message: "Missing required booking fields" });
     }
 
     const qrCode = await QRCode.toDataURL(
-      JSON.stringify({
-        firstName,
-        secondName,
-        phoneNumber,
-        email,
-        paymentId,
-        orderId,
-        timestamp: new Date().toISOString()
-      })
+      JSON.stringify({ firstName, secondName, phoneNumber, email, paymentId, orderId })
     );
 
     const booking = new Booking({
@@ -187,7 +152,7 @@ app.post("/save-booking", async (req, res) => {
       email,
       paymentId,
       orderId,
-      status: 'confirmed'
+      status: "confirmed",
     });
 
     await booking.save();
@@ -195,7 +160,7 @@ app.post("/save-booking", async (req, res) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Booking Confirmation',
+      subject: "Booking Confirmation",
       html: `
         <h1>Booking Confirmation</h1>
         <p>Dear ${firstName} ${secondName},</p>
@@ -205,33 +170,24 @@ app.post("/save-booking", async (req, res) => {
           <li>Order ID: ${orderId}</li>
           <li>Payment ID: ${paymentId}</li>
         </ul>
-        <img src="${qrCode}" alt="QR Code"/>
-      `
+        <img src="${qrCode}" alt="QR Code" />
+      `,
     });
 
-    res.status(201).json({ 
-      success: true, 
-      message: "Booking saved successfully",
-      qrCode,
-      bookingId: booking._id
-    });
-
+    res.status(201).json({ success: true, message: "Booking saved successfully" });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Error saving booking",
-      details: error.message 
-    });
+    console.error("Error saving booking:", error.message);
+    res.status(500).json({ success: false, message: "Error saving booking" });
   }
 });
 
 // Webhook route
-app.post("/webhook", (req, res) => {
+app.post("/webhook", express.json(), async (req, res) => {
   try {
     const webhookBody = JSON.stringify(req.body);
     const razorpaySignature = req.headers["x-razorpay-signature"];
-
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
     const generated_signature = crypto
       .createHmac("sha256", webhookSecret)
       .update(webhookBody)
@@ -243,24 +199,24 @@ app.post("/webhook", (req, res) => {
 
     const event = req.body.event;
 
-    switch (event) {
-      case "payment.captured":
-        console.log("Payment Captured:", req.body.payload.payment.entity);
-        break;
-      case "payment.failed":
-        console.log("Payment Failed:", req.body.payload.payment.entity);
-        break;
-      default:
-        console.log("Unhandled event:", event);
+    if (event === "payment.captured") {
+      const payment = req.body.payload.payment.entity;
+      console.log("Payment Captured:", payment);
+
+      // Update database with captured payment status
+      await Booking.updateOne({ orderId: payment.order_id }, { status: "captured" });
+    } else if (event === "payment.failed") {
+      const payment = req.body.payload.payment.entity;
+      console.log("Payment Failed:", payment);
+
+      // Update database with failed payment status
+      await Booking.updateOne({ orderId: payment.order_id }, { status: "failed" });
     }
 
     res.status(200).json({ success: true });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Webhook processing failed", 
-      details: error.message 
-    });
+    console.error("Webhook error:", error.message);
+    res.status(500).json({ success: false, message: "Webhook processing failed" });
   }
 });
 
@@ -270,7 +226,7 @@ app.listen(port, () => {
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on("SIGTERM", () => {
   mongoose.connection.close(() => {
     process.exit(0);
   });
