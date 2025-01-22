@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
@@ -7,44 +6,40 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const QRCode = require("qrcode");
 const nodemailer = require("nodemailer");
-const path = require("path");
+require("dotenv").config();
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
-// Middleware
+// Basic middleware
 app.use(bodyParser.json());
-app.use(
-  cors({
-    origin: "https://launch.startupleague.net", // Allowed origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-    credentials: true, // Allow credentials (cookies, etc.)
-    exposedHeaders: ["x-rtb-fingerprint-id"], // Expose custom headers
-  })
-);
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Add middleware to explicitly expose the headers
+// Simple CORS configuration
+app.use(cors({
+  origin: '*',  // Allows all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
+  credentials: true
+}));
+
+// Additional headers for CORS
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://launch.startupleague.net");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.setHeader("Access-Control-Expose-Headers", "x-rtb-fingerprint-id"); // Expose the custom header
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
   next();
 });
 
-// Razorpay instance
+// Razorpay configuration
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
-
-// Venue details
-const VENUE_DETAILS = {
-  name: "Startup League Conference Hall",
-  address: "",
-  date: "Feb 23rd, 2025",
-  time: "08:30 AM to 06:30 PM",
-};
 
 // MongoDB connection
 mongoose
@@ -53,7 +48,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log("MongoDB Connection Error:", err));
+  .catch((err) => console.error("MongoDB Connection Error:", err));
 
 // Booking Schema
 const bookingSchema = new mongoose.Schema({
@@ -64,188 +59,195 @@ const bookingSchema = new mongoose.Schema({
   paymentId: { type: String, required: true },
   orderId: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
+  status: { type: String, default: 'pending' }
 });
+
 const Booking = mongoose.model("Booking", bookingSchema);
 
-// Generate Ticket Email Template
-const generateTicketHTML = (ticketDetails, qrCode) => {
-  const {
-    firstName,
-    secondName,
-    email,
-    phoneNumber,
-    paymentId,
-    orderId,
-    tickets = [],
-    venueDetails,
-  } = ticketDetails;
+// Email configuration (if needed)
+const transporter = nodemailer.createTransport({
+  service: process.env.EMAIL_SERVICE,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
 
-  const totalTickets = tickets.length > 0 ? tickets.reduce((sum, ticket) => sum + ticket.quantity, 0) : 0;
-
-  return `
-    <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-      <h1 style="text-align: center;">Startup League Event 2025</h1>
-      <img src="cid:ticketImage" alt="Ticket" style="width: 100%; max-width: 600px; display: block; margin: 0 auto;" />
-
-      <h2>Ticket Details</h2>
-      <p><strong>Name:</strong> ${firstName} ${secondName}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phoneNumber}</p>
-      <p><strong>Payment ID:</strong> ${paymentId}</p>
-      <p><strong>Order ID:</strong> ${orderId}</p>
-
-      <h2>Venue Details</h2>
-      <p><strong>Venue:</strong> HITEX Exhibition Center, Hyderabad, Telangana 500084</p>
-      <p><strong>Date:</strong> Feb 23rd, 2025</p>
-      <p><strong>Time:</strong> 08:30 AM to 06:30 PM</p>
-
-      <h2>Order Summary</h2>
-      ${tickets.length > 0
-        ? tickets.map((ticket) => `<p><strong>${ticket.type}:</strong> ${ticket.quantity} ticket(s)</p>`).join("")
-        : "<p>No tickets available</p>"}
-      <p><strong>Total Tickets:</strong> ${totalTickets}</p>
-
-      <h2>Scan for Details</h2>
-      <img src="${qrCode}" alt="QR Code" style="display: block; margin: 0 auto;" />
-    </div>
-  `;
-};
-
-// Routes
+// Health check route
 app.get("/", (req, res) => {
   res.send("Razorpay backend is running.");
 });
 
 // Create Razorpay order
 app.post("/order", async (req, res) => {
-  const { amount, currency, receipt } = req.body;
-
-  if (!amount || !currency || !receipt) {
-    return res.status(400).json({ error: "Missing required fields: amount, currency, receipt" });
-  }
-
   try {
+    const { amount, currency, receipt } = req.body;
+
+    if (!amount || !currency || !receipt) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Missing required fields",
+        details: "amount, currency, and receipt are required" 
+      });
+    }
+
     const options = {
-      amount: amount * 100, // Convert to paise
+      amount: amount * 100,
       currency,
       receipt,
     };
 
     const order = await razorpay.orders.create(options);
-    res.json({ order });
+    res.json({ success: true, order });
+    
   } catch (error) {
-    res.status(500).json({ error: "Failed to create Razorpay order", details: error.message });
+    console.error("Order creation error:", error);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to create Razorpay order",
+      details: error.message 
+    });
   }
 });
 
 // Validate payment
-app.post("/validate", (req, res) => {
-  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
-
-  if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-    return res.status(400).json({ success: false, message: "Missing required fields" });
-  }
-
+app.post("/validate", async (req, res) => {
   try {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Missing payment validation fields" 
+      });
+    }
+
     const generated_signature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
 
     if (generated_signature === razorpay_signature) {
       res.status(200).json({ success: true });
     } else {
-      res.status(400).json({ success: false, message: "Invalid signature" });
+      res.status(400).json({ 
+        success: false, 
+        message: "Invalid payment signature" 
+      });
     }
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Internal server error" });
+  } catch (error) {
+    console.error("Validation error:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error validating payment",
+      details: error.message 
+    });
   }
 });
 
-// Save booking data and send email
+// Save booking data
 app.post("/save-booking", async (req, res) => {
-  const { firstName, secondName, phoneNumber, email, paymentId, orderId, tickets, venueDetails } = req.body;
-
-  if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
-    return res.status(400).json({ success: false, message: "Missing required fields" });
-  }
-
   try {
-    // Generate QR Code
-    const qrData = JSON.stringify({
-      name: `${firstName} ${secondName}`,
-      email,
-      phoneNumber,
-      paymentId,
-      orderId,
-      tickets,
-      venueDetails,
-    });
-    const qrCode = await QRCode.toDataURL(qrData);
+    const { firstName, secondName, phoneNumber, email, paymentId, orderId } = req.body;
 
-    // Save booking data
-    const newBooking = new Booking({
+    if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Missing required booking fields" 
+      });
+    }
+
+    // Generate QR code
+    const qrCode = await QRCode.toDataURL(
+      JSON.stringify({
+        firstName,
+        secondName,
+        phoneNumber,
+        email,
+        paymentId,
+        orderId,
+        timestamp: new Date().toISOString()
+      })
+    );
+
+    // Create and save booking
+    const booking = new Booking({
       firstName,
       secondName,
       phoneNumber,
       email,
       paymentId,
       orderId,
-    });
-    await newBooking.save();
-
-    // Generate email content
-    const emailContent = generateTicketHTML(
-      {
-        firstName,
-        secondName,
-        email,
-        phoneNumber,
-        paymentId,
-        orderId,
-        tickets,
-        venueDetails,
-      },
-      "cid:qrCodeImage"
-    );
-
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: "developer@bizandbeez.com",
-        pass: "lqfzkxurejqzdnpq",
-      },
+      status: 'confirmed'
     });
 
-    const mailOptions = {
-      from: '"Startup League" <developer@bizandbeez.com>',
-      to: email,
-      subject: "Booking Confirmation - Startup League",
-      html: emailContent,
-      attachments: [
-        {
-          filename: "TicketImg.jpg",
-          path: path.join(__dirname, "./assets/TicketImg.jpg"),
-          cid: "ticketImage",
-        },
-        {
-          filename: "QrCode.png",
-          content: Buffer.from(qrCode.split(",")[1], "base64"),
-          cid: "qrCodeImage",
-        },
-      ],
-    };
+    await booking.save();
 
-    await transporter.sendMail(mailOptions);
-    res.status(201).json({ success: true, message: "Booking saved and email sent." });
+    // Send email confirmation if configured
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Booking Confirmation',
+        html: `
+          <h1>Booking Confirmation</h1>
+          <p>Dear ${firstName} ${secondName},</p>
+          <p>Your booking has been confirmed.</p>
+          <p>Booking Details:</p>
+          <ul>
+            <li>Order ID: ${orderId}</li>
+            <li>Payment ID: ${paymentId}</li>
+          </ul>
+          <img src="${qrCode}" alt="QR Code"/>
+        `
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log('Confirmation email sent');
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        // Continue with response even if email fails
+      }
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Booking saved successfully",
+      qrCode,
+      bookingId: booking._id
+    });
+
   } catch (error) {
-    console.error("Error saving booking data or sending email:", error);
-    res.status(500).json({ success: false, message: "Failed to save booking data or send email." });
+    console.error("Error saving booking:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error saving booking",
+      details: error.message 
+    });
   }
 });
 
-// Start the server
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    success: false, 
+    message: "Internal server error",
+    details: err.message 
+  });
+});
+
+// Start server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Performing graceful shutdown...');
+  mongoose.connection.close(() => {
+    console.log('MongoDB connection closed.');
+    process.exit(0);
+  });
 });
