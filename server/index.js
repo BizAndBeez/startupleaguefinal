@@ -29,7 +29,7 @@ REQUIRED_ENV_VARS.forEach((key) => {
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: ["https://startupleaguefinal-1-front.onrender.com"], // Update with your frontend URL
+    origin: ["https://startupleaguefinal-1front.onrender.com"], // Update with your frontend URL
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
