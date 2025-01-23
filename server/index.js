@@ -82,53 +82,85 @@ app.get("/", (req, res) => {
 });
 
 // Create Razorpay order
+// In /order route
 app.post("/order", async (req, res) => {
   try {
-    const { amount, currency, receipt } = req.body;
-
-    if (!amount || !currency || !receipt) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing required fields",
-      });
-    }
+    console.log("Order Creation Request:", {
+      amount: req.body.amount,
+      currency: req.body.currency,
+      receipt: req.body.receipt,
+      fullBody: req.body
+    });
 
     const options = {
-      amount: amount * 100,
-      currency,
-      receipt,
+      amount: req.body.amount * 100, // Explicit multiplication
+      currency: req.body.currency,
+      receipt: req.body.receipt,
     };
 
     const order = await razorpay.orders.create(options);
-    res.json({ success: true, order });
+    console.log("Razorpay Order Created:", JSON.stringify(order, null, 2));
+    
+    res.json({ 
+      success: true, 
+      order,
+      requestDetails: {
+        originalAmount: req.body.amount,
+        processedAmount: options.amount
+      }
+    });
   } catch (error) {
-    console.error("Error creating order:", error.message);
-    res.status(500).json({ success: false, error: "Failed to create Razorpay order" });
+    console.error("Order Creation Error Details:", {
+      message: error.message,
+      stack: error.stack,
+      razorpayError: error.response?.data || 'No Razorpay specific error'
+    });
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      details: error.response?.data || 'Unknown error'
+    });
   }
 });
 
-// Validate payment
+// In /validate route
 app.post("/validate", async (req, res) => {
   try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
-
-    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-      return res.status(400).json({ success: false, message: "Missing payment validation fields" });
-    }
+    console.log("Validation Payload:", req.body);
 
     const generated_signature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .update(`${req.body.razorpay_order_id}|${req.body.razorpay_payment_id}`)
       .digest("hex");
 
-    if (generated_signature === razorpay_signature) {
+    console.log("Signature Validation:", {
+      generatedSignature: generated_signature,
+      receivedSignature: req.body.razorpay_signature,
+      signatureMatch: generated_signature === req.body.razorpay_signature
+    });
+
+    if (generated_signature === req.body.razorpay_signature) {
       res.status(200).json({ success: true });
     } else {
-      res.status(400).json({ success: false, message: "Invalid payment signature" });
+      res.status(400).json({ 
+        success: false, 
+        message: "Invalid payment signature",
+        details: {
+          generatedSignature: generated_signature,
+          receivedSignature: req.body.razorpay_signature
+        }
+      });
     }
   } catch (error) {
-    console.error("Error validating payment:", error.message);
-    res.status(500).json({ success: false, message: "Payment validation failed" });
+    console.error("Validation Error:", {
+      message: error.message,
+      stack: error.stack
+    });
+    res.status(500).json({ 
+      success: false, 
+      message: "Payment validation failed",
+      errorDetails: error.message 
+    });
   }
 });
 
@@ -186,7 +218,7 @@ app.post("/webhook", express.json(), async (req, res) => {
   try {
     const webhookBody = JSON.stringify(req.body);
     const razorpaySignature = req.headers["x-razorpay-signature"];
-    const webhookSecret = "indian@2025";
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
     const generated_signature = crypto
       .createHmac("sha256", webhookSecret)
