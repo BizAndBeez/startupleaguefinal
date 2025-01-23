@@ -35,6 +35,26 @@ app.use(
   })
 );
 
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB Connection Error:", err.message));
+
+// Define Booking Schema and Model
+const bookingSchema = new mongoose.Schema({
+  firstName: { type: String, required: true },
+  secondName: { type: String, required: true },
+  email: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  tickets: { type: Array, required: true },
+  totalAmount: { type: Number, required: true },
+  paymentId: { type: String, required: true },
+  orderId: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+const Booking = mongoose.model("Booking", bookingSchema);
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -77,6 +97,35 @@ app.post("/validate", async (req, res) => {
   } catch (error) {
     console.error("Validation Error:", error.message);
     res.status(500).json({ success: false, error: "Validation failed" });
+  }
+});
+
+// Save Booking Route
+app.post("/save-booking", async (req, res) => {
+  try {
+    const { firstName, secondName, email, phoneNumber, tickets, totalAmount, paymentId, orderId } = req.body;
+
+    if (!firstName || !secondName || !email || !phoneNumber || !tickets || !totalAmount || !paymentId || !orderId) {
+      return res.status(400).json({ success: false, error: "Missing booking details" });
+    }
+
+    const booking = new Booking({
+      firstName,
+      secondName,
+      email,
+      phoneNumber,
+      tickets,
+      totalAmount,
+      paymentId,
+      orderId,
+    });
+
+    await booking.save();
+
+    res.status(200).json({ success: true, message: "Booking saved successfully" });
+  } catch (error) {
+    console.error("Save Booking Error:", error.message);
+    res.status(500).json({ success: false, error: "Failed to save booking" });
   }
 });
 
