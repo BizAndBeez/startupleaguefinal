@@ -63,7 +63,7 @@ const BookingPage = () => {
       document.body.appendChild(script);
     });
   };
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -93,56 +93,47 @@ const BookingPage = () => {
   };
 
   const initializeRazorpay = async () => {
-    console.log("Payment Initialization Started", {
-      totalAmount,
-      razorpayKey: import.meta.env.VITE_RAZORPAY_KEY_ID
-    });
-  
-    const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
-    if (!res) {
-      console.error('Razorpay SDK Load Failure');
-      alert('Razorpay SDK failed to load. Please check your internet connection.');
-      return;
-    }
-    
     try {
-      const orderDetails = await fetchWithRetry(
-        "https://startupleaguefinal.onrender.com/order",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: totalAmount,
-            currency: "INR",
-            receipt: `receipt_${Date.now()}`,
-          }),
-        }
-      );
-    
-      console.log("Order Details Received", { 
-        orderDetails, 
-        hasOrder: !!orderDetails?.order 
-      });
+      const loadScript = (src) => {
+        return new Promise((resolve) => {
+          const script = document.createElement("script");
+          script.src = src;
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        });
+      };
   
-      if (!orderDetails || !orderDetails.order) {
-        console.error("Order Creation Failure", { orderDetails });
-        alert("Failed to create Razorpay order. Please try again.");
+      const razorpayLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      if (!razorpayLoaded) {
+        alert("Razorpay SDK failed to load. Check your internet connection.");
         return;
       }
-    
+  
+      const orderDetails = await fetchWithRetry("https://startupleaguefinal.onrender.com/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: totalAmount,
+          currency: "INR",
+          receipt: `receipt_${Date.now()}`,
+        }),
+      });
+  
+      if (!orderDetails?.order?.id) {
+        alert("Failed to create order. Please try again.");
+        return;
+      }
+  
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderDetails.order.amount,
         currency: orderDetails.order.currency,
-        name: "Startup League",
-        description: "Event Booking Payment",
-        image: startupleague_logo,
         order_id: orderDetails.order.id,
+        name: "Startup League",
+        description: "Event Payment",
+        image: "/logo.png",
         handler: async (response) => {
-          console.log("Payment Response Received", { response });
-  
           try {
             const validateResponse = await fetchWithRetry(
               "https://startupleaguefinal.onrender.com/validate",
@@ -152,51 +143,14 @@ const BookingPage = () => {
                 body: JSON.stringify(response),
               }
             );
-    
-            console.log("Validation Response", { validateResponse });
   
             if (validateResponse.success) {
-              const saveBookingResponse = await fetchWithRetry(
-                "https://startupleaguefinal.onrender.com/save-booking",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    ...formData,
-                    tickets,
-                    totalAmount,
-                    paymentId: response.razorpay_payment_id,
-                    orderId: response.razorpay_order_id,
-                  }),
-                }
-              );
-    
-              console.log("Save Booking Response", { saveBookingResponse });
-  
-              if (saveBookingResponse.success) {
-                alert("Payment Successful! Booking data saved.");
-                setTicketDetails({
-                  ...formData,
-                  tickets,
-                  totalAmount,
-                  paymentId: response.razorpay_payment_id,
-                  orderId: response.razorpay_order_id,
-                });
-                setShowTicket(true);
-              } else {
-                console.error("Booking Save Failure", { saveBookingResponse });
-                alert("Payment Successful, but failed to save booking data.");
-              }
+              alert("Payment Successful!");
             } else {
-              console.error("Payment Validation Failure", { validateResponse });
-              alert("Payment Validation Failed!");
+              alert("Payment validation failed!");
             }
-          } catch (error) {
-            console.error("Payment Processing Error", {
-              message: error.message,
-              stack: error.stack
-            });
-            alert(`Payment Processing Error: ${error.message}`);
+          } catch (err) {
+            alert("Error validating payment. Please try again.");
           }
         },
         prefill: {
@@ -207,23 +161,16 @@ const BookingPage = () => {
         theme: {
           color: "#3399cc",
         },
-        modal: {
-          ondismiss: () => {
-            console.log("Payment Modal Dismissed");
-          }
-        }
       };
-    
+  
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
-    } catch (error) {
-      console.error("Razorpay Initialization Error", {
-        message: error.message,
-        stack: error.stack
-      });
-      alert(`Razorpay Initialization Failed: ${error.message}`);
+    } catch (err) {
+      console.error("Razorpay Error:", err.message);
+      alert("Error initializing Razorpay. Please try again.");
     }
   };
+  
   
   return (
     <section className='Booking-Page-Container'>
