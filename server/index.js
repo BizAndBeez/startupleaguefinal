@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const QRCode = require("qrcode");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const { console } = require("inspector");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -102,6 +103,7 @@ app.post("/order", async (req, res) => {
 // Validate payment
 app.post("/validate", (req, res) => {
   const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+  console.log(req.body);
 
   if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
     return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -215,6 +217,27 @@ app.post("/webhook", express.json(), (req, res) => {
     res.status(500).json({ success: false, message: "Failed to process webhook" });
   }
 });
+
+app.post("/webhook", express.json(), (req, res) => {
+  console.log("Webhook event received:", req.body);
+
+  const razorpaySignature = req.headers["x-razorpay-signature"];
+  const generated_signature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET)
+    .update(JSON.stringify(req.body))
+    .digest("hex");
+
+  if (generated_signature === razorpaySignature) {
+    if (req.body.event === "payment.captured") {
+      console.log("Payment captured for:", req.body.payload.payment.entity.id);
+    }
+    res.status(200).send("OK");
+  } else {
+    console.error("Invalid webhook signature.");
+    res.status(400).send("Invalid signature.");
+  }
+});
+
 
 // Start the server
 app.listen(port, () => {
