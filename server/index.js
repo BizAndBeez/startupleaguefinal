@@ -85,40 +85,82 @@ app.get("/", (req, res) => {
 // In /order route
 app.post("/order", async (req, res) => {
   try {
-    console.log("Order Creation Request:", {
-      amount: req.body.amount,
-      currency: req.body.currency,
-      receipt: req.body.receipt,
-      fullBody: req.body
-    });
+    const { amount, currency, receipt } = req.body;
+
+    // Validate input parameters
+    if (!amount || !currency || !receipt) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing required parameters",
+        details: {
+          amount: !!amount,
+          currency: !!currency,
+          receipt: !!receipt
+        }
+      });
+    }
+
+    // Validate amount is a positive number
+    const processedAmount = Math.round(Number(amount) * 100);
+    if (isNaN(processedAmount) || processedAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid amount",
+        details: {
+          originalAmount: amount,
+          processedAmount
+        }
+      });
+    }
 
     const options = {
-      amount: req.body.amount * 100, // Explicit multiplication
-      currency: req.body.currency,
-      receipt: req.body.receipt,
+      amount: processedAmount,
+      currency,
+      receipt,
     };
 
+    console.log("Razorpay Order Request:", {
+      options,
+      originalAmount: amount
+    });
+
     const order = await razorpay.orders.create(options);
-    console.log("Razorpay Order Created:", JSON.stringify(order, null, 2));
+
+    console.log("Razorpay Order Created:", {
+      orderId: order.id,
+      amount: order.amount,
+      status: order.status
+    });
     
     res.json({ 
       success: true, 
       order,
       requestDetails: {
-        originalAmount: req.body.amount,
+        originalAmount: amount,
         processedAmount: options.amount
       }
     });
   } catch (error) {
-    console.error("Order Creation Error Details:", {
+    console.error("Order Creation Error:", {
       message: error.message,
-      stack: error.stack,
-      razorpayError: error.response?.data || 'No Razorpay specific error'
+      code: error.code,
+      type: error.type,
+      razorpayError: error.response?.data
     });
+
+    // Handle specific Razorpay error scenarios
+    if (error.code === 'BAD_REQUEST_ERROR') {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid Razorpay request",
+        details: error.response?.data
+      });
+    }
+
     res.status(500).json({ 
       success: false, 
-      error: error.message,
-      details: error.response?.data || 'Unknown error'
+      error: "Internal server error during order creation",
+      details: error.message
     });
   }
 });
