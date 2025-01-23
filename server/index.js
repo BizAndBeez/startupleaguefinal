@@ -17,8 +17,6 @@ const REQUIRED_ENV_VARS = [
   "MONGO_URI",
   "RAZORPAY_KEY_ID",
   "RAZORPAY_KEY_SECRET",
-  "GMAIL_USER",
-  "GMAIL_PASS",
 ];
 REQUIRED_ENV_VARS.forEach((key) => {
   if (!process.env[key]) {
