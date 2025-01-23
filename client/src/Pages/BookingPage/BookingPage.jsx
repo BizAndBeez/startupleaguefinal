@@ -135,6 +135,7 @@ const BookingPage = () => {
         image: "/logo.png",
         handler: async (response) => {
           try {
+            // Validate payment
             const validateResponse = await fetchWithRetry(
               "https://startupleaguefinal.onrender.com/validate",
               {
@@ -145,12 +146,40 @@ const BookingPage = () => {
             );
   
             if (validateResponse.success) {
-              alert("Payment Successful!");
+              // Save booking data
+              const saveBookingResponse = await fetchWithRetry(
+                "https://startupleaguefinal.onrender.com/save-booking",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    ...formData,
+                    tickets,
+                    totalAmount,
+                    paymentId: response.razorpay_payment_id,
+                    orderId: response.razorpay_order_id,
+                  }),
+                }
+              );
+  
+              if (saveBookingResponse.success) {
+                alert("Payment Successful! Booking data saved.");
+                setTicketDetails({
+                  ...formData,
+                  tickets,
+                  totalAmount,
+                  paymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                });
+                setShowTicket(true);
+              } else {
+                alert("Payment Successful, but failed to save booking data.");
+              }
             } else {
               alert("Payment validation failed!");
             }
           } catch (err) {
-            alert("Error validating payment. Please try again.");
+            alert("Error processing payment. Please try again.");
           }
         },
         prefill: {
@@ -170,6 +199,7 @@ const BookingPage = () => {
       alert("Error initializing Razorpay. Please try again.");
     }
   };
+  
   
   
   return (
