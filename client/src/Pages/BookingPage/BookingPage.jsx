@@ -49,15 +49,21 @@ const BookingPage = () => {
   const [isFormValid, setIsFormValid] = useState(false);
 
   const loadScript = (src) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = src;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
+      script.onload = () => {
+        console.log('Razorpay script loaded successfully');
+        resolve(true);
+      };
+      script.onerror = (error) => {
+        console.error('Razorpay script load error:', error);
+        reject(false);
+      };
       document.body.appendChild(script);
     });
   };
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
