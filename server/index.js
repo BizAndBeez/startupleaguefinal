@@ -8,15 +8,46 @@ const mongoose = require("mongoose");
 const QRCode = require("qrcode");
 const nodemailer = require("nodemailer");
 const path = require("path");
-// import ticketImg from './assets/TicketImg.jpg'
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
+
+// Ensure critical environment variables are set
+const REQUIRED_ENV_VARS = [
+  "MONGO_URI",
+  "RAZORPAY_KEY_ID",
+  "RAZORPAY_KEY_SECRET",
+  "GMAIL_USER",
+  "GMAIL_PASS",
+];
+REQUIRED_ENV_VARS.forEach((key) => {
+  if (!process.env[key]) {
+    console.error(`Error: Missing required environment variable: ${key}`);
+    process.exit(1);
+  }
+});
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
-app.use('/assets', express.static('assets'));
+app.use(
+  cors({
+    origin: ["https://startupleaguefinal-front.onrender.com"], // Update with your frontend URL
+    credentials: true,
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.use("/assets", express.static("assets"));
+
+// Redirect HTTP to HTTPS in production
+if (process.env.NODE_ENV === "production") {
+  app.use((req, res, next) => {
+    if (req.headers["x-forwarded-proto"] !== "https") {
+      return res.redirect(`https://${req.hostname}${req.url}`);
+    }
+    next();
+  });
+}
 
 // Razorpay instance
 const razorpay = new Razorpay({
@@ -24,22 +55,11 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Venue details
-const VENUE_DETAILS = {
-  name: "Startup League Conference Hall",
-  address: "",
-  date: "Feb 23rd, 2025",
-  time: "08:30 AM to 06:30 PM",
-};
-
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log("MongoDB Connection Error:", err));
+  .catch((err) => console.error("MongoDB Connection Error:", err));
 
 // Booking Schema
 const bookingSchema = new mongoose.Schema({
@@ -52,50 +72,6 @@ const bookingSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 const Booking = mongoose.model("Booking", bookingSchema);
-
-// Generate Ticket Email Template
-const generateTicketHTML = (ticketDetails, qrCode) => {
-  const {
-    firstName,
-    secondName,
-    email,
-    phoneNumber,
-    paymentId,
-    orderId,
-    tickets = [],
-    venueDetails,
-  } = ticketDetails;
-
-  const totalTickets = tickets.length > 0 ? tickets.reduce((sum, ticket) => sum + ticket.quantity, 0) : 0;
-
-  return `
-    <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-      <h1 style="text-align: center;">Startup League Event 2025</h1>
-      <img src="cid:ticketImage" alt="Ticket" style="width: 100%; max-width: 600px; display: block; margin: 0 auto;" />
-
-      <h2>Ticket Details</h2>
-      <p><strong>Name:</strong> ${firstName} ${secondName}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phoneNumber}</p>
-      <p><strong>Payment ID:</strong> ${paymentId}</p>
-      <p><strong>Order ID:</strong> ${orderId}</p>
-
-      <h2>Venue Details</h2>
-      <p><strong>Venue:</strong> HITEX Exhibition Center, Hyderabad, Telangana 500084</p>
-      <p><strong>Date:</strong> Feb 23rd, 2025</p>
-      <p><strong>Time:</strong> 08:30 AM to 06:30 PM</p>
-
-      <h2>Order Summary</h2>
-      ${tickets.length > 0
-        ? tickets.map((ticket) => `<p><strong>${ticket.type}:</strong> ${ticket.quantity} ticket(s)</p>`).join("")
-        : "<p>No tickets available</p>"}
-      <p><strong>Total Tickets:</strong> ${totalTickets}</p>
-
-      <h2>Scan for Details</h2>
-      <img src="${qrCode}" alt="QR Code" style="display: block; margin: 0 auto;" />
-    </div>
-  `;
-};
 
 // Routes
 app.get("/", (req, res) => {
@@ -120,6 +96,7 @@ app.post("/order", async (req, res) => {
     const order = await razorpay.orders.create(options);
     res.json({ order });
   } catch (error) {
+    console.error("Order Creation Error:", error.message);
     res.status(500).json({ error: "Failed to create Razorpay order", details: error.message });
   }
 });
@@ -144,6 +121,7 @@ app.post("/validate", (req, res) => {
       res.status(400).json({ success: false, message: "Invalid signature" });
     }
   } catch (err) {
+    console.error("Validation Error:", err.message);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
@@ -169,8 +147,6 @@ app.post("/save-booking", async (req, res) => {
     });
     const qrCode = await QRCode.toDataURL(qrData);
 
-    // const qrCodeBuffer = Buffer.from(qrCode.split(",")[1], "base64") 
-
     // Save booking data
     const newBooking = new Booking({
       firstName,
@@ -184,25 +160,16 @@ app.post("/save-booking", async (req, res) => {
 
     // Generate email content
     const emailContent = generateTicketHTML(
-      {
-        firstName,
-        secondName,
-        email,
-        phoneNumber,
-        paymentId,
-        orderId,
-        tickets,
-        venueDetails,
-      },
-      // "cid:qrCodeImage" 
-      );
+      { firstName, secondName, email, phoneNumber, paymentId, orderId, tickets, venueDetails },
+      qrCode
+    );
 
     // Send email
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "developer@bizandbeez.com",
-        pass: "lqfzkxurejqzdnpq",
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS,
       },
     });
 
@@ -217,22 +184,39 @@ app.post("/save-booking", async (req, res) => {
           path: path.join(__dirname, "./assets/TicketImg.jpg"),
           cid: "ticketImage",
         },
-        // {
-        //   filename: "QrCode.png",
-        //   content: qrCodeBuffer,
-        //   cid: "qrCode"
-        // },
       ],
     };
 
     await transporter.sendMail(mailOptions);
     res.status(201).json({ success: true, message: "Booking saved and email sent." });
   } catch (error) {
-    console.error("Error saving booking data or sending email:", error);
+    console.error("Error saving booking data or sending email:", error.message);
     res.status(500).json({ success: false, message: "Failed to save booking data or send email." });
   }
 });
 
+// Razorpay Webhook (Optional but Recommended)
+app.post("/webhook", express.json(), (req, res) => {
+  const razorpaySignature = req.headers["x-razorpay-signature"];
+  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+  try {
+    const generatedSignature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(JSON.stringify(req.body))
+      .digest("hex");
+
+    if (generatedSignature === razorpaySignature) {
+      console.log("Webhook Event Received:", req.body.event);
+      res.status(200).json({ success: true });
+    } else {
+      res.status(400).json({ success: false, message: "Invalid webhook signature" });
+    }
+  } catch (error) {
+    console.error("Webhook Error:", error.message);
+    res.status(500).json({ success: false, message: "Failed to process webhook" });
+  }
+});
 
 // Start the server
 app.listen(port, () => {
