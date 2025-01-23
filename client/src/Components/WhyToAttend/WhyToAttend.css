@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 500px;
+    height: 100%;
     padding-top: 40px;
 }
 
@@ -65,6 +65,44 @@
     font-size: 17px;
     color: yellow;
 }
+.organizedby-container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    padding-bottom: 40px;
+    padding-top: 30px;
+    background-color: rgb(23, 32, 42);
+    
+}
+.organizedby-headtext{
+    font-size: 30px;
+    color: white;
+}
+.organizedby-imgcontainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    margin-top: 40px;
+}
+.organizer-individual-imgcontainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.organizer-img{
+    width: 250px;
+    border-radius: 10px;
+}
+.organizer-nametext{
+    color: white;
+    letter-spacing: 0.5px;
+}
 
 @media(min-width:850px) and (max-width:1285.99px) {
     .whytoattend-container {
@@ -97,6 +135,10 @@
     .whytoattend-endpara2 {
         font-size: 16px;
         text-align: center;
+    }
+    .organizer-img{
+        width: 200px;
+        border-radius: 10px;
     }
 }
 @media(min-width:500px) and (max-width:849.99px) {
@@ -133,6 +175,18 @@
     .whytoattend-endpara2 {
         font-size: 16px;
         text-align: center;
+    }
+    .organizedby-imgcontainer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 40px;
+    }
+    .organizer-img{
+        width: 250px;
+        border-radius: 10px;
     }
 }
 @media(min-width:350px) and (max-width:499.99px) {
@@ -174,6 +228,23 @@
     .whytoattend-headtext {
         font-size: 22px
     }
+    .organizedby-headtext{
+        font-size: 25px;
+        color: white;
+    }
+    .organizedby-imgcontainer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 25px;
+    }
+    .organizer-img{
+        height: 300px;
+        width: auto;
+        border-radius: 10px;
+    }
 }
 @media(max-width:349.99px) {
     .whytoattend-container {
@@ -212,5 +283,22 @@
     }
     .whytoattend-headtext {
         font-size: 22px
+    }
+    .organizedby-headtext{
+        font-size: 25px;
+        color: white;
+    }
+    .organizedby-imgcontainer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 25px;
+    }
+    .organizer-img{
+        height: 300px;
+        width: auto;
+        border-radius: 10px;
     }
 }

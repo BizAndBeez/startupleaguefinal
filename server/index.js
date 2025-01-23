@@ -1,187 +1,240 @@
+require("dotenv").config();
 const express = require("express");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
-require("dotenv").config();
+const QRCode = require("qrcode");
+const nodemailer = require("nodemailer");
+const path = require("path");
+// import ticketImg from './assets/TicketImg.jpg'
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = 5000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+app.use('/assets', express.static('assets'));
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://startupleaguefinal-front.onrender.com",
-  "https://launch.startupleague.net",
-];
-
-// CORS Configuration
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
-  })
-);
-
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB Connection Error:", err.message));
-
-// Define Booking Schema and Model
-const bookingSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  secondName: { type: String, required: true },
-  email: { type: String, required: true },
-  phoneNumber: { type: String, required: true },
-  tickets: { type: Array, required: true },
-  totalAmount: { type: Number, required: true },
-  paymentId: { type: String, required: true },
-  orderId: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
-
-const Booking = mongoose.model("Booking", bookingSchema);
-
+// Razorpay instance
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Order Creation Route
+// Venue details
+const VENUE_DETAILS = {
+  name: "Startup League Conference Hall",
+  address: "",
+  date: "Feb 23rd, 2025",
+  time: "08:30 AM to 06:30 PM",
+};
+
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log("MongoDB Connection Error:", err));
+
+// Booking Schema
+const bookingSchema = new mongoose.Schema({
+  firstName: { type: String, required: true },
+  secondName: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  email: { type: String, required: true },
+  paymentId: { type: String, required: true },
+  orderId: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+const Booking = mongoose.model("Booking", bookingSchema);
+
+// Generate Ticket Email Template
+const generateTicketHTML = (ticketDetails, qrCode) => {
+  const {
+    firstName,
+    secondName,
+    email,
+    phoneNumber,
+    paymentId,
+    orderId,
+    tickets = [],
+    venueDetails,
+  } = ticketDetails;
+
+  const totalTickets = tickets.length > 0 ? tickets.reduce((sum, ticket) => sum + ticket.quantity, 0) : 0;
+
+  return `
+    <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+      <h1 style="text-align: center;">Startup League Event 2025</h1>
+      <img src="cid:ticketImage" alt="Ticket" style="width: 100%; max-width: 600px; display: block; margin: 0 auto;" />
+
+      <h2>Ticket Details</h2>
+      <p><strong>Name:</strong> ${firstName} ${secondName}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phoneNumber}</p>
+      <p><strong>Payment ID:</strong> ${paymentId}</p>
+      <p><strong>Order ID:</strong> ${orderId}</p>
+
+      <h2>Venue Details</h2>
+      <p><strong>Venue:</strong> HITEX Exhibition Center, Hyderabad, Telangana 500084</p>
+      <p><strong>Date:</strong> Feb 23rd, 2025</p>
+      <p><strong>Time:</strong> 08:30 AM to 06:30 PM</p>
+
+      <h2>Order Summary</h2>
+      ${tickets.length > 0
+        ? tickets.map((ticket) => `<p><strong>${ticket.type}:</strong> ${ticket.quantity} ticket(s)</p>`).join("")
+        : "<p>No tickets available</p>"}
+      <p><strong>Total Tickets:</strong> ${totalTickets}</p>
+
+      <h2>Scan for Details</h2>
+      <img src="${qrCode}" alt="QR Code" style="display: block; margin: 0 auto;" />
+    </div>
+  `;
+};
+
+// Routes
+app.get("/", (req, res) => {
+  res.send("Razorpay backend is running.");
+});
+
+// Create Razorpay order
 app.post("/order", async (req, res) => {
+  const { amount, currency, receipt } = req.body;
+
+  if (!amount || !currency || !receipt) {
+    return res.status(400).json({ error: "Missing required fields: amount, currency, receipt" });
+  }
+
   try {
-    const { amount, currency, receipt } = req.body;
+    const options = {
+      amount: amount * 100, // Convert to paise
+      currency,
+      receipt,
+    };
 
-    if (!amount || !currency || !receipt) {
-      return res.status(400).json({ success: false, error: "Missing parameters" });
-    }
-
-    const options = { amount: amount * 100, currency, receipt };
     const order = await razorpay.orders.create(options);
-
-    res.status(200).json({ success: true, order });
+    res.json({ order });
   } catch (error) {
-    console.error("Order Creation Error:", error.message);
-    res.status(500).json({ success: false, error: "Failed to create order" });
+    res.status(500).json({ error: "Failed to create Razorpay order", details: error.message });
   }
 });
 
-// Payment Validation Route
-app.post("/validate", async (req, res) => {
-  try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+// Validate payment
+app.post("/validate", (req, res) => {
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
+  if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
+
+  try {
     const generated_signature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
       .digest("hex");
 
     if (generated_signature === razorpay_signature) {
       res.status(200).json({ success: true });
     } else {
-      res.status(400).json({ success: false, error: "Invalid signature" });
+      res.status(400).json({ success: false, message: "Invalid signature" });
     }
-  } catch (error) {
-    console.error("Validation Error:", error.message);
-    res.status(500).json({ success: false, error: "Validation failed" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
-// Save Booking Route
+// Save booking data and send email
 app.post("/save-booking", async (req, res) => {
+  const { firstName, secondName, phoneNumber, email, paymentId, orderId, tickets, venueDetails } = req.body;
+
+  if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
+
   try {
-    const { firstName, secondName, email, phoneNumber, tickets, totalAmount, paymentId, orderId } = req.body;
-
-    if (!firstName || !secondName || !email || !phoneNumber || !tickets || !totalAmount || !paymentId || !orderId) {
-      return res.status(400).json({ success: false, error: "Missing booking details" });
-    }
-
-    const booking = new Booking({
-      firstName,
-      secondName,
+    // Generate QR Code
+    const qrData = JSON.stringify({
+      name: `${firstName} ${secondName}`,
       email,
       phoneNumber,
+      paymentId,
+      orderId,
       tickets,
-      totalAmount,
+      venueDetails,
+    });
+    const qrCode = await QRCode.toDataURL(qrData);
+
+    // const qrCodeBuffer = Buffer.from(qrCode.split(",")[1], "base64") 
+
+    // Save booking data
+    const newBooking = new Booking({
+      firstName,
+      secondName,
+      phoneNumber,
+      email,
       paymentId,
       orderId,
     });
+    await newBooking.save();
 
-    await booking.save();
+    // Generate email content
+    const emailContent = generateTicketHTML(
+      {
+        firstName,
+        secondName,
+        email,
+        phoneNumber,
+        paymentId,
+        orderId,
+        tickets,
+        venueDetails,
+      },
+      // "cid:qrCodeImage" 
+      );
 
-    res.status(200).json({ success: true, message: "Booking saved successfully" });
+    // Send email
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: "developer@bizandbeez.com",
+        pass: "lqfzkxurejqzdnpq",
+      },
+    });
+
+    const mailOptions = {
+      from: '"Startup League" <developer@bizandbeez.com>',
+      to: email,
+      subject: "Booking Confirmation - Startup League",
+      html: emailContent,
+      attachments: [
+        {
+          filename: "TicketImg.jpg",
+          path: path.join(__dirname, "./assets/TicketImg.jpg"),
+          cid: "ticketImage",
+        },
+        // {
+        //   filename: "QrCode.png",
+        //   content: qrCodeBuffer,
+        //   cid: "qrCode"
+        // },
+      ],
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(201).json({ success: true, message: "Booking saved and email sent." });
   } catch (error) {
-    console.error("Save Booking Error:", error.message);
-    res.status(500).json({ success: false, error: "Failed to save booking" });
+    console.error("Error saving booking data or sending email:", error);
+    res.status(500).json({ success: false, message: "Failed to save booking data or send email." });
   }
 });
 
-// Get All Bookings Route
-app.get("/bookings", async (req, res) => {
-  try {
-    const bookings = await Booking.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, bookings });
-  } catch (error) {
-    console.error("Fetch Bookings Error:", error.message);
-    res.status(500).json({ success: false, error: "Failed to fetch bookings" });
-  }
-});
 
-// Get Booking by Order ID
-app.get("/booking/:orderId", async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const booking = await Booking.findOne({ orderId });
-    if (!booking) {
-      return res.status(404).json({ success: false, error: "Booking not found" });
-    }
-    res.status(200).json({ success: true, booking });
-  } catch (error) {
-    console.error("Fetch Booking Error:", error.message);
-    res.status(500).json({ success: false, error: "Failed to fetch booking" });
-  }
-});
-
-// Webhook Route
-app.post("/webhook", express.json(), async (req, res) => {
-  try {
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
-    const razorpaySignature = req.headers["x-razorpay-signature"];
-    const generated_signature = crypto
-      .createHmac("sha256", webhookSecret)
-      .update(JSON.stringify(req.body))
-      .digest("hex");
-
-    if (generated_signature !== razorpaySignature) {
-      return res.status(400).json({ success: false, error: "Invalid webhook signature" });
-    }
-
-    if (req.body.event === "payment.captured") {
-      console.log("Payment Captured:", req.body.payload.payment.entity);
-    }
-
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error("Webhook Error:", error.message);
-    res.status(500).json({ success: false, error: "Webhook failed" });
-  }
-});
-
-// Start Server
+// Start the server
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });

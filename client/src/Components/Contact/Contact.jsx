@@ -38,12 +38,12 @@ const Contact = () => {
 
         {/* Social Media Icons */}
         <span className="social-icons-container">
-          <a href=""><img className="social-instagram-icon" src={instagram} alt="instagram" /></a>
-          <a href=""><img className="social-icon" src={twitter} alt="instagram" /></a>
-          <a href=""><img className="social-youtube-icon" src={youtube} alt="instagram" /></a>
-          <a href=""><img className="social-icon" src={whatsapp} alt="instagram" /></a>
-          <a href=""><img className="social-icon" src={linkedin} alt="linkedin" /></a>
-          <a href=""><img className="social-icon" src={facebook} alt="facebook" /></a>
+          <a target='_blank' href="https://www.instagram.com/bizandbeez?igsh=aHJzdWptMDR2dDNx"><img className="social-instagram-icon" src={instagram} alt="instagram" /></a>
+          <a target='_blank' href="https://x.com/i/flow/login?redirect_after_login=%2Fstartupleagues"><img className="social-icon" src={twitter} alt="instagram" /></a>
+          <a target='_blank' href="https://www.youtube.com/@bizandbeez"><img className="social-youtube-icon" src={youtube} alt="instagram" /></a>
+          <a target='_blank' href=""><img className="social-icon" src={whatsapp} alt="instagram" /></a>
+          <a target='_blank' href="https://www.linkedin.com/company/biz-and-beez-creatives-llp/"><img className="social-icon" src={linkedin} alt="linkedin" /></a>
+          <a target='_blank' href="https://www.facebook.com/profile.php?id=61570638726854"><img className="social-icon" src={facebook} alt="facebook" /></a>
         </span>
       </div>
 

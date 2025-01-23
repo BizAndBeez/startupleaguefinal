@@ -7,7 +7,7 @@ const bookingSchema = new mongoose.Schema({
   email: { type: String, required: true },
   paymentId: { type: String, required: true }, // Razorpay payment ID
   orderId: { type: String, required: true },  // Razorpay order ID
-  qrCode: { type: String }, // QR Code as base64 string
+  // qrCode: { type: String }, // QR Code as base64 string
   createdAt: { type: Date, default: Date.now },
 });
 
