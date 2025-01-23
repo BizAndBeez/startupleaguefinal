@@ -36,7 +36,8 @@ app.use(
 );
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB Connection Error:", err.message));
 
@@ -126,6 +127,32 @@ app.post("/save-booking", async (req, res) => {
   } catch (error) {
     console.error("Save Booking Error:", error.message);
     res.status(500).json({ success: false, error: "Failed to save booking" });
+  }
+});
+
+// Get All Bookings Route
+app.get("/bookings", async (req, res) => {
+  try {
+    const bookings = await Booking.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    console.error("Fetch Bookings Error:", error.message);
+    res.status(500).json({ success: false, error: "Failed to fetch bookings" });
+  }
+});
+
+// Get Booking by Order ID
+app.get("/booking/:orderId", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const booking = await Booking.findOne({ orderId });
+    if (!booking) {
+      return res.status(404).json({ success: false, error: "Booking not found" });
+    }
+    res.status(200).json({ success: true, booking });
+  } catch (error) {
+    console.error("Fetch Booking Error:", error.message);
+    res.status(500).json({ success: false, error: "Failed to fetch booking" });
   }
 });
 
