@@ -128,6 +128,7 @@ app.post("/validate", (req, res) => {
 
 // Save booking data and send email
 app.post("/save-booking", async (req, res) => {
+  console.log(req.body);
   const { firstName, secondName, phoneNumber, email, paymentId, orderId, tickets, venueDetails } = req.body;
 
   if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
