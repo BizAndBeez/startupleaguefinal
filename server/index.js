@@ -145,7 +145,7 @@ app.post("/save-booking", async (req, res) => {
       tickets,
       venueDetails,
     });
-    const qrCode = await QRCode.toDataURL(qrData);
+    
 
     // Save booking data
     const newBooking = new Booking({
@@ -161,7 +161,7 @@ app.post("/save-booking", async (req, res) => {
     // Generate email content
     const emailContent = generateTicketHTML(
       { firstName, secondName, email, phoneNumber, paymentId, orderId, tickets, venueDetails },
-      qrCode
+      
     );
 
     // Send email
