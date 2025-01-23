@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import QRCode from "react-qr-code";
 import startupleague_logo from '../../assets/startupleague_logo.png';
@@ -28,12 +28,13 @@ const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
 };
 
 const BookingPage = () => {
-  const location = useLocation(); 
+  const location = useLocation();
   const { tickets = [], totalAmount = 0 } = location.state || {};
 
   const [isOpen, setIsOpen] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [ticketDetails, setTicketDetails] = useState(null);
+  const [allBookings, setAllBookings] = useState([]); // New state for fetching all bookings
   const [formData, setFormData] = useState({
     firstName: '',
     secondName: '',
@@ -47,6 +48,20 @@ const BookingPage = () => {
     email: false,
   });
   const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    // Fetch all bookings on component mount
+    const fetchBookings = async () => {
+      try {
+        const bookings = await fetchWithRetry("https://startupleaguefinal.onrender.com/bookings");
+        setAllBookings(bookings.bookings);
+      } catch (error) {
+        console.error("Error fetching bookings:", error.message);
+      }
+    };
+
+    fetchBookings();
+  }, []);
 
   const loadScript = (src) => {
     return new Promise((resolve, reject) => {
@@ -94,22 +109,12 @@ const BookingPage = () => {
 
   const initializeRazorpay = async () => {
     try {
-      const loadScript = (src) => {
-        return new Promise((resolve) => {
-          const script = document.createElement("script");
-          script.src = src;
-          script.onload = () => resolve(true);
-          script.onerror = () => resolve(false);
-          document.body.appendChild(script);
-        });
-      };
-  
       const razorpayLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
       if (!razorpayLoaded) {
         alert("Razorpay SDK failed to load. Check your internet connection.");
         return;
       }
-  
+
       const orderDetails = await fetchWithRetry("https://startupleaguefinal.onrender.com/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -119,12 +124,12 @@ const BookingPage = () => {
           receipt: `receipt_${Date.now()}`,
         }),
       });
-  
+
       if (!orderDetails?.order?.id) {
         alert("Failed to create order. Please try again.");
         return;
       }
-  
+
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderDetails.order.amount,
@@ -135,7 +140,6 @@ const BookingPage = () => {
         image: "/logo.png",
         handler: async (response) => {
           try {
-            // Validate payment
             const validateResponse = await fetchWithRetry(
               "https://startupleaguefinal.onrender.com/validate",
               {
@@ -144,9 +148,8 @@ const BookingPage = () => {
                 body: JSON.stringify(response),
               }
             );
-  
+
             if (validateResponse.success) {
-              // Save booking data
               const saveBookingResponse = await fetchWithRetry(
                 "https://startupleaguefinal.onrender.com/save-booking",
                 {
@@ -161,7 +164,7 @@ const BookingPage = () => {
                   }),
                 }
               );
-  
+
               if (saveBookingResponse.success) {
                 alert("Payment Successful! Booking data saved.");
                 setTicketDetails({
@@ -191,7 +194,7 @@ const BookingPage = () => {
           color: "#3399cc",
         },
       };
-  
+
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
     } catch (err) {
@@ -199,85 +202,17 @@ const BookingPage = () => {
       alert("Error initializing Razorpay. Please try again.");
     }
   };
-  
-  
-  
+
   return (
     <section className='Booking-Page-Container'>
       <img src={startupleague_logo} className='booking-startup-logo' alt='Startup League Logo' />
       {!showTicket ? (
         <div className='form-container'>
+          {/* Form Section */}
           <div className='form-container-2'>
             <span className='start-text'>1. Add your details</span>
-
-            <div className='first-input-container'>
-              <div className='first-name-container'>
-                <span>First Name</span>
-                <input
-                  type='text'
-                  className={`first-name ${formErrors.firstName ? 'error' : ''}`}
-                  name='firstName'
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors.firstName && <span className='error-message'>First name is required</span>}
-              </div>
-
-              <div className='second-name-container'>
-                <span>Second Name</span>
-                <input
-                  type='text'
-                  className={`second-name ${formErrors.secondName ? 'error' : ''}`}
-                  name='secondName'
-                  value={formData.secondName}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors.secondName && <span className='error-message'>Second name is required</span>}
-              </div>
-            </div>
-
-            <div className='second-input-container'>
-              <div className='phone-number-container'>
-                <span>*Phone Number</span>
-                <input
-                  type='text'
-                  className={`phone-number ${formErrors.phoneNumber ? 'error' : ''}`}
-                  name='phoneNumber'
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors.phoneNumber && <span className='error-message'>Phone number is required</span>}
-              </div>
-            </div>
-
-            <div className='email-container'>
-              <span>*Email</span>
-              <input
-                type='email'
-                className={`email ${formErrors.email ? 'error' : ''}`}
-                name='email'
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                pattern='[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
-                title='Please enter a valid email address (e.g., user@example.com)'
-                placeholder=''
-              />
-              {formErrors.email && <span className='error-message'>A valid email is required</span>}
-            </div>
-
-            <span className='button-container'>
-              <button
-                className='submit-button'
-                onClick={handleSubmit}
-                disabled={!isFormValid}
-              >
-                Continue
-              </button>
-            </span>
+            {/* Form Inputs */}
+            {/* Add Booking Form */}
           </div>
         </div>
       ) : (
