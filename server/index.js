@@ -64,6 +64,81 @@ const bookingSchema = new mongoose.Schema({
 });
 const Booking = mongoose.model("Booking", bookingSchema);
 
+// Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
+});
+
+// Email sending function
+async function sendBookingConfirmationEmail(bookingDetails) {
+  const { 
+    email, 
+    firstName, 
+    secondName, 
+    tickets, 
+    totalAmount, 
+    paymentId, 
+    orderId 
+  } = bookingDetails;
+
+  const mailOptions = {
+    from: '"Startup League" <your-email@gmail.com>',
+    to: email,
+    subject: "Booking Confirmation - Startup League",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #333;">Booking Confirmation</h1>
+        <p>Hello ${firstName} ${secondName},</p>
+        <p>Your booking for Startup League is confirmed!</p>
+        
+        <h2>Booking Summary</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">Total Amount</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">₹${totalAmount}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">Payment ID</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${paymentId}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">Order ID</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${orderId}</td>
+          </tr>
+        </table>
+
+        <h3>Ticket Details</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <th style="border: 1px solid #ddd; padding: 8px;">Event</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Quantity</th>
+          </tr>
+          ${tickets.map(ticket => `
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">${ticket.eventName}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${ticket.quantity}</td>
+            </tr>
+          `).join('')}
+        </table>
+
+        <p>Thank you for choosing Startup League!</p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${email}`);
+  } catch (error) {
+    console.error("Email sending error:", error);
+    throw error;
+  }
+}
+
 // Routes
 app.get("/", (req, res) => {
   res.send("Razorpay backend is running.");
@@ -120,53 +195,57 @@ app.post("/validate", (req, res) => {
 
 // Save booking data and send email
 app.post("/save-booking", async (req, res) => {
-  
-    console.log('Save Booking Request Body:', JSON.stringify(req.body, null, 2));
-  
-    const { 
-      firstName, 
-      secondName, 
-      phoneNumber, 
-      email, 
-      paymentId, 
-      orderId, 
-      tickets, 
-      totalAmount 
-    } = req.body;
-  
-    if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Missing required fields",
-        receivedData: req.body 
-      });
-    }
-  
-    try {
-      // Save booking data
-      const newBooking = new Booking({
-        firstName,
-        secondName,
-        phoneNumber,
-        email,
-        paymentId,
-        orderId,
-      });
-      await newBooking.save();
-  
-      res.status(201).json({ 
-        success: true, 
-        message: "Booking saved successfully" 
-      });
-    } catch (error) {
-      console.error("Error saving booking:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Failed to save booking data",
-        error: error.message 
-      });
-    }
-  
+  console.log('Save Booking Request Body:', JSON.stringify(req.body, null, 2));
+
+  const { 
+    firstName, 
+    secondName, 
+    phoneNumber, 
+    email, 
+    paymentId, 
+    orderId, 
+    tickets, 
+    totalAmount 
+  } = req.body;
+
+  // Validation
+  if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "Missing required fields",
+      receivedData: req.body 
+    });
+  }
+
+  try {
+    // Save booking data
+    const newBooking = new Booking({
+      firstName,
+      secondName,
+      phoneNumber,
+      email,
+      paymentId,
+      orderId,
+      tickets,
+      totalAmount
+    });
+    await newBooking.save();
+
+    // Send confirmation email
+    await sendBookingConfirmationEmail(req.body);
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Booking saved and email sent successfully" 
+    });
+  } catch (error) {
+    console.error("Error saving booking or sending email:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to save booking or send email",
+      error: error.message 
+    });
+  }
 });
 
 // Razorpay Webhook (Optional but Recommended)
