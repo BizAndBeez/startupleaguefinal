@@ -128,72 +128,53 @@ app.post("/validate", (req, res) => {
 
 // Save booking data and send email
 app.post("/save-booking", async (req, res) => {
-  console.log(req.body);
-  const { firstName, secondName, phoneNumber, email, paymentId, orderId, tickets, venueDetails } = req.body;
-
-  if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
-    return res.status(400).json({ success: false, message: "Missing required fields" });
-  }
-
-  try {
-    // Generate QR Code
-    const qrData = JSON.stringify({
-      name: `${firstName} ${secondName}`,
-      email,
-      phoneNumber,
-      paymentId,
-      orderId,
-      tickets,
-      venueDetails,
-    });
-    
-
-    // Save booking data
-    const newBooking = new Booking({
-      firstName,
-      secondName,
-      phoneNumber,
-      email,
-      paymentId,
-      orderId,
-    });
-    await newBooking.save();
-
-    // Generate email content
-    const emailContent = generateTicketHTML(
-      { firstName, secondName, email, phoneNumber, paymentId, orderId, tickets, venueDetails },
-      
-    );
-
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: '"Startup League" <developer@bizandbeez.com>',
-      to: email,
-      subject: "Booking Confirmation - Startup League",
-      html: emailContent,
-      attachments: [
-        {
-          filename: "TicketImg.jpg",
-          path: path.join(__dirname, "./assets/TicketImg.jpg"),
-          cid: "ticketImage",
-        },
-      ],
-    };
-
-    await transporter.sendMail(mailOptions);
-    res.status(201).json({ success: true, message: "Booking saved and email sent." });
-  } catch (error) {
-    console.error("Error saving booking data or sending email:", error.message);
-    res.status(500).json({ success: false, message: "Failed to save booking data or send email." });
-  }
+  app.post("/save-booking", async (req, res) => {
+    console.log('Save Booking Request Body:', JSON.stringify(req.body, null, 2));
+  
+    const { 
+      firstName, 
+      secondName, 
+      phoneNumber, 
+      email, 
+      paymentId, 
+      orderId, 
+      tickets, 
+      totalAmount 
+    } = req.body;
+  
+    if (!firstName || !secondName || !phoneNumber || !email || !paymentId || !orderId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Missing required fields",
+        receivedData: req.body 
+      });
+    }
+  
+    try {
+      // Save booking data
+      const newBooking = new Booking({
+        firstName,
+        secondName,
+        phoneNumber,
+        email,
+        paymentId,
+        orderId,
+      });
+      await newBooking.save();
+  
+      res.status(201).json({ 
+        success: true, 
+        message: "Booking saved successfully" 
+      });
+    } catch (error) {
+      console.error("Error saving booking:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to save booking data",
+        error: error.message 
+      });
+    }
+  });
 });
 
 // Razorpay Webhook (Optional but Recommended)
