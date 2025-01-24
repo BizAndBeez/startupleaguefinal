@@ -128,7 +128,7 @@ app.post("/validate", (req, res) => {
 
 // Save booking data and send email
 app.post("/save-booking", async (req, res) => {
-  app.post("/save-booking", async (req, res) => {
+  
     console.log('Save Booking Request Body:', JSON.stringify(req.body, null, 2));
   
     const { 
@@ -174,7 +174,7 @@ app.post("/save-booking", async (req, res) => {
         error: error.message 
       });
     }
-  });
+  
 });
 
 // Razorpay Webhook (Optional but Recommended)
