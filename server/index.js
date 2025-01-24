@@ -84,6 +84,13 @@ async function sendBookingConfirmationEmail(bookingDetails) {
     orderId 
   } = bookingDetails;
 
+  // Venue and event details
+  const VENUE_DETAILS = {
+    name: "HITEX Exhibition Center, Hyderabad, Telangana 500084",
+    date: "23rd Feb 2025",
+    time: "8:30 AM to 6:30 PM",
+  };
+
   // Generate a summary of the tickets
   const ticketSummary = tickets.length > 0 
     ? tickets.map(ticket => `
@@ -120,6 +127,11 @@ async function sendBookingConfirmationEmail(bookingDetails) {
           </tr>
         </table>
 
+        <h2 style="color: #555;">Venue Details</h2>
+        <p><strong>Venue:</strong> ${VENUE_DETAILS.name}</p>
+        <p><strong>Date:</strong> ${VENUE_DETAILS.date}</p>
+        <p><strong>Time:</strong> ${VENUE_DETAILS.time}</p>
+
         <h2 style="color: #555;">Ticket Details</h2>
         <table style="width: 100%; border-collapse: collapse;">
           <thead>
@@ -148,6 +160,7 @@ async function sendBookingConfirmationEmail(bookingDetails) {
     throw error;
   }
 }
+
 
 
 // Routes
