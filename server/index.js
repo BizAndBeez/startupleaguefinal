@@ -73,59 +73,69 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Email sending function
 async function sendBookingConfirmationEmail(bookingDetails) {
   const { 
     email, 
     firstName, 
     secondName, 
-    tickets, 
+    tickets = [], 
     totalAmount, 
     paymentId, 
     orderId 
   } = bookingDetails;
+
+  // Generate a summary of the tickets
+  const ticketSummary = tickets.length > 0 
+    ? tickets.map(ticket => `
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">${ticket.type || ticket.eventName}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${ticket.quantity}</td>
+        </tr>
+      `).join('') 
+    : '<tr><td colspan="2" style="border: 1px solid #ddd; padding: 8px; text-align: center;">No tickets available</td></tr>';
 
   const mailOptions = {
     from: '"Startup League" <your-email@gmail.com>',
     to: email,
     subject: "Booking Confirmation - Startup League",
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #333;">Booking Confirmation</h1>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 16px; background-color: #f9f9f9;">
+        <h1 style="color: #333; text-align: center;">Booking Confirmation</h1>
         <p>Hello ${firstName} ${secondName},</p>
-        <p>Your booking for Startup League is confirmed!</p>
+        <p>Thank you for booking with Startup League. Below are your booking details:</p>
         
-        <h2>Booking Summary</h2>
-        <table style="width: 100%; border-collapse: collapse;">
+        <h2 style="color: #555;">Booking Summary</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
           <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">Total Amount</td>
+            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Total Amount</td>
             <td style="border: 1px solid #ddd; padding: 8px;">₹${totalAmount}</td>
           </tr>
           <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">Payment ID</td>
+            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Payment ID</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${paymentId}</td>
           </tr>
           <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">Order ID</td>
+            <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Order ID</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${orderId}</td>
           </tr>
         </table>
 
-        <h3>Ticket Details</h3>
+        <h2 style="color: #555;">Ticket Details</h2>
         <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <th style="border: 1px solid #ddd; padding: 8px;">Event</th>
-            <th style="border: 1px solid #ddd; padding: 8px;">Quantity</th>
-          </tr>
-          ${tickets.map(ticket => `
+          <thead>
             <tr>
-              <td style="border: 1px solid #ddd; padding: 8px;">${ticket.eventName}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${ticket.quantity}</td>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Ticket Type</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Quantity</th>
             </tr>
-          `).join('')}
+          </thead>
+          <tbody>
+            ${ticketSummary}
+          </tbody>
         </table>
 
-        <p>Thank you for choosing Startup League!</p>
+        <p style="margin-top: 16px;">We look forward to seeing you at the event!</p>
+
+        <p><strong>Startup League</strong></p>
       </div>
     `,
   };
@@ -138,6 +148,7 @@ async function sendBookingConfirmationEmail(bookingDetails) {
     throw error;
   }
 }
+
 
 // Routes
 app.get("/", (req, res) => {
