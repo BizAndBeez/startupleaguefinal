@@ -30,7 +30,7 @@ REQUIRED_ENV_VARS.forEach((key) => {
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: ["https://launch.startupleague.net, http://localhost:5174"], // Update with your frontend URL
+    origin: ["https://launch.startupleague.net"], // Update with your frontend URL
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
